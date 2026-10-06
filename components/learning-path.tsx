@@ -76,7 +76,7 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
           </h3>
           <div className="flex items-center gap-1.5 shrink-0">
             <span
-              className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+              className="text-xs px-1.5 py-0.5 rounded-full font-medium"
               style={{
                 background: `oklch(0.2 0.04 ${hue} / 60%)`,
                 color: `oklch(0.8 0.1 ${hue})`,
@@ -84,7 +84,7 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
             >
               {label}
             </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/5 text-muted-foreground">
+            <span className="text-xs px-1.5 py-0.5 rounded-full bg-white/5 text-muted-foreground">
               {lesson.estimatedMinutes}min
             </span>
           </div>
@@ -96,7 +96,7 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
             {lesson.concepts.map((concept) => (
               <span
                 key={concept}
-                className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                className="text-xs px-2 py-0.5 rounded-full font-medium"
                 style={{
                   background: "oklch(0.18 0.03 300 / 50%)",
                   color: "oklch(0.75 0.08 300)",
@@ -115,7 +115,7 @@ function LessonCard({ lesson, index }: { lesson: Lesson; index: number }) {
         {shouldTruncate && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="text-[10px] font-medium transition-colors"
+            className="text-xs font-medium transition-colors"
             style={{ color: `oklch(0.7 0.1 ${hue})` }}
           >
             {expanded ? "Show less" : "Show more"}

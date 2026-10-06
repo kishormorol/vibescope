@@ -149,7 +149,7 @@ function TreeItem({
       />
       <span className="truncate">{node.name}</span>
       {node.file && (
-        <span className="ml-auto text-[10px] text-muted-foreground opacity-60">
+        <span className="ml-auto text-xs text-muted-foreground opacity-60">
           {node.file.lines}L
         </span>
       )}
@@ -161,7 +161,7 @@ function DifficultyBadge({ difficulty }: { difficulty: Difficulty }) {
   const { hue, label } = DIFFICULTY_COLORS[difficulty];
   return (
     <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
       style={{
         background: `oklch(0.2 0.04 ${hue} / 60%)`,
         color: `oklch(0.8 0.12 ${hue})`,
@@ -175,7 +175,7 @@ function DifficultyBadge({ difficulty }: { difficulty: Difficulty }) {
 
 function CategoryBadge({ category }: { category: string }) {
   return (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/5 text-muted-foreground border border-white/10">
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-white/5 text-muted-foreground border border-white/10">
       {category}
     </span>
   );

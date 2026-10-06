@@ -102,14 +102,14 @@ export default function HomePage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-xs text-muted-foreground">
+          <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full glass text-sm text-muted-foreground">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             Explore any AI-built codebase
           </span>
         </motion.div>
 
         {/* Title */}
-        <h1 className="text-6xl sm:text-7xl font-bold tracking-tighter">
+        <h1 className="text-7xl sm:text-8xl font-bold tracking-tighter">
           <span className="bg-gradient-to-r from-[oklch(0.75_0.18_260)] via-[oklch(0.8_0.15_195)] to-[oklch(0.72_0.17_155)] bg-clip-text text-transparent">
             Vibe
           </span>
@@ -121,7 +121,7 @@ export default function HomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed"
+          className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
         >
           See how your code was built. Interactive visualization of the entire
           SWE pipeline — technologies, concepts, decisions, and learning paths.
@@ -139,13 +139,13 @@ export default function HomePage() {
               value={repoUrl}
               onChange={(e) => setRepoUrl(e.target.value)}
               placeholder="github.com/user/repo"
-              className="h-12 pl-4 pr-4 rounded-xl glass border-[oklch(0.25_0.03_260_/_50%)] text-sm font-mono focus:glow-primary transition-all"
+              className="h-14 pl-5 pr-5 rounded-xl glass border-[oklch(0.25_0.03_260_/_50%)] text-base font-mono focus:glow-primary transition-all"
             />
           </div>
           <Button
             onClick={handleAnalyze}
             disabled={!repoUrl.trim()}
-            className="h-12 px-8 rounded-xl font-semibold text-sm relative overflow-hidden group"
+            className="h-14 px-10 rounded-xl font-semibold text-base relative overflow-hidden group"
             style={{
               background:
                 "linear-gradient(135deg, oklch(0.55 0.18 260), oklch(0.6 0.15 195))",
@@ -164,12 +164,12 @@ export default function HomePage() {
         >
           <button
             onClick={handleDemo}
-            className="inline-flex items-center gap-3 px-5 py-3 rounded-xl glass hover:glow-cyan transition-all group text-sm"
+            className="inline-flex items-center gap-3 px-6 py-3.5 rounded-xl glass hover:glow-cyan transition-all group text-base"
           >
             <span className="text-muted-foreground group-hover:text-foreground transition-colors">
               Try Demo
             </span>
-            <span className="text-xs text-muted-foreground/50">
+            <span className="text-sm text-muted-foreground/50">
               ThinkDiff (8K lines)
             </span>
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
@@ -193,7 +193,7 @@ export default function HomePage() {
           ].map((f) => (
             <span
               key={f.label}
-              className="px-3 py-1.5 rounded-lg text-[11px] font-mono glass border-[oklch(0.25_0.03_260_/_30%)] text-muted-foreground/70"
+              className="px-4 py-2 rounded-lg text-sm font-mono glass border-[oklch(0.25_0.03_260_/_30%)] text-muted-foreground/70"
             >
               <span style={{ color: `oklch(0.7 0.15 ${f.color})` }}>
                 {f.icon}

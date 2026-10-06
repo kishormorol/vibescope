@@ -71,7 +71,7 @@ function CenterNode(_props: NodeProps) {
         <div className="text-center">
           <div className="text-2xl mb-0.5">◎</div>
           <div
-            className="text-[10px] font-bold tracking-widest uppercase"
+            className="text-xs font-bold tracking-widest uppercase"
             style={{ color: "oklch(0.85 0.08 260)" }}
           >
             Project
@@ -128,7 +128,7 @@ function TechNode({ data }: NodeProps) {
         <div className="flex items-center gap-2 mb-1.5">
           {tech.icon && <span className="text-lg">{tech.icon}</span>}
           <span
-            className="font-semibold text-sm leading-tight"
+            className="font-semibold text-base leading-tight"
             style={{ color: `oklch(0.92 0.06 ${h})` }}
           >
             {tech.name}
@@ -138,7 +138,7 @@ function TechNode({ data }: NodeProps) {
         {/* Category badge + version */}
         <div className="flex items-center gap-1.5 flex-wrap mb-1">
           <span
-            className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
+            className="text-[11px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
             style={{
               background: `oklch(0.3 0.06 ${h} / 50%)`,
               color: `oklch(0.78 0.1 ${h})`,
@@ -148,7 +148,7 @@ function TechNode({ data }: NodeProps) {
           </span>
           {tech.version && (
             <span
-              className="text-[9px] font-mono px-1.5 py-0.5 rounded-md"
+              className="text-[11px] font-mono px-1.5 py-0.5 rounded-md"
               style={{
                 background: "oklch(0.2 0.01 0 / 50%)",
                 color: "oklch(0.65 0 0)",
@@ -161,7 +161,7 @@ function TechNode({ data }: NodeProps) {
 
         {/* Description (always visible, truncated unless expanded) */}
         <p
-          className="text-[10px] leading-relaxed mt-1"
+          className="text-xs leading-relaxed mt-1"
           style={{
             color: "oklch(0.7 0.02 0)",
             display: "-webkit-box",
@@ -186,12 +186,12 @@ function TechNode({ data }: NodeProps) {
               {/* Why chosen */}
               <div className="mt-2 pt-2" style={{ borderTop: `1px solid oklch(0.3 0.04 ${h} / 40%)` }}>
                 <div
-                  className="text-[9px] uppercase tracking-wider font-bold mb-0.5"
+                  className="text-[11px] uppercase tracking-wider font-bold mb-0.5"
                   style={{ color: `oklch(0.65 0.08 ${h})` }}
                 >
                   Why chosen
                 </div>
-                <p className="text-[10px] leading-relaxed" style={{ color: "oklch(0.68 0.02 0)" }}>
+                <p className="text-xs leading-relaxed" style={{ color: "oklch(0.68 0.02 0)" }}>
                   {tech.whyChosen}
                 </p>
               </div>
@@ -203,7 +203,7 @@ function TechNode({ data }: NodeProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="inline-block mt-2 text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md transition-colors"
+                  className="inline-block mt-2 text-[11px] font-bold uppercase tracking-wider px-2 py-1 rounded-md transition-colors"
                   style={{
                     background: `oklch(0.3 0.06 ${h} / 40%)`,
                     color: `oklch(0.78 0.12 ${h})`,

@@ -110,11 +110,11 @@ export default function AnalyzePage() {
         <div className="flex items-center gap-4">
           <Link
             href="/"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-muted-foreground hover:text-foreground glass border-[oklch(0.2_0.02_260_/_30%)] hover:border-[oklch(0.3_0.05_260_/_40%)] transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground glass border-[oklch(0.2_0.02_260_/_30%)] hover:border-[oklch(0.3_0.05_260_/_40%)] transition-all"
           >
             ← Home
           </Link>
-          <h1 className="text-lg font-bold tracking-tighter">
+          <h1 className="text-2xl font-bold tracking-tighter">
             <span className="bg-gradient-to-r from-[oklch(0.75_0.18_260)] to-[oklch(0.8_0.15_195)] bg-clip-text text-transparent">
               Vibe
             </span>
@@ -124,10 +124,10 @@ export default function AnalyzePage() {
 
         {analysis && (
           <div className="flex items-center gap-3">
-            <span className="text-xs font-mono text-muted-foreground/60">
+            <span className="text-sm font-mono text-muted-foreground/60">
               {analysis.summary.name}
             </span>
-            <span className="text-[10px] font-mono px-2 py-1 rounded glass text-muted-foreground/40">
+            <span className="text-xs font-mono px-3 py-1.5 rounded glass text-muted-foreground/50">
               {analysis.summary.totalFiles} files ·{" "}
               {analysis.summary.totalLines.toLocaleString()} lines
             </span>

@@ -66,7 +66,7 @@ function ConceptNodeComponent({ data }: NodeProps<Node<ConceptNodeData>>) {
           </div>
           <div className="flex items-center gap-1.5 flex-wrap">
             <span
-              className="text-[9px] px-1.5 py-0.5 rounded-full font-medium"
+              className="text-xs px-1.5 py-0.5 rounded-full font-medium"
               style={{
                 background: `oklch(0.25 0.04 ${hue} / 60%)`,
                 color: `oklch(0.8 0.1 ${hue})`,
@@ -74,7 +74,7 @@ function ConceptNodeComponent({ data }: NodeProps<Node<ConceptNodeData>>) {
             >
               {label}
             </span>
-            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-white/5 text-muted-foreground">
+            <span className="text-xs px-1.5 py-0.5 rounded-full bg-white/5 text-muted-foreground">
               {concept.category}
             </span>
           </div>
@@ -87,7 +87,7 @@ function ConceptNodeComponent({ data }: NodeProps<Node<ConceptNodeData>>) {
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <p className="text-[11px] text-foreground/60 leading-relaxed mt-1.5">
+                <p className="text-xs text-foreground/60 leading-relaxed mt-1.5">
                   {concept.explanation}
                 </p>
                 {concept.docUrl && (
@@ -95,7 +95,7 @@ function ConceptNodeComponent({ data }: NodeProps<Node<ConceptNodeData>>) {
                     href={concept.docUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[10px] mt-1 inline-block underline"
+                    className="text-xs mt-1 inline-block underline"
                     style={{ color: `oklch(0.7 0.1 220)` }}
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -236,7 +236,7 @@ export function ConceptGraph() {
                 className="w-2 h-2 rounded-full"
                 style={{ background: `oklch(0.7 0.15 ${hue})` }}
               />
-              <span className="text-[10px] text-muted-foreground">{label}</span>
+              <span className="text-xs text-muted-foreground">{label}</span>
             </div>
           );
         })}

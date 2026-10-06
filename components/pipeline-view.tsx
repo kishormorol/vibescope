@@ -61,11 +61,11 @@ function PipelineNode({ data }: { data: PipelineNodeData }) {
       />
 
       {/* Icon */}
-      <div className="text-3xl mb-2 select-none">{stage.icon}</div>
+      <div className="text-4xl mb-2 select-none">{stage.icon}</div>
 
       {/* Label */}
       <div
-        className="font-bold text-sm mb-1"
+        className="font-bold text-base mb-1"
         style={{ color: `oklch(0.85 0.1 ${hue})` }}
       >
         {stage.label}
@@ -73,7 +73,7 @@ function PipelineNode({ data }: { data: PipelineNodeData }) {
 
       {/* Description */}
       <p
-        className="text-[11px] leading-relaxed mb-3 font-mono"
+        className="text-xs leading-relaxed mb-3 font-mono"
         style={{ color: `oklch(0.6 0.03 ${hue})` }}
       >
         {stage.description}
@@ -85,7 +85,7 @@ function PipelineNode({ data }: { data: PipelineNodeData }) {
           {stage.technologiesUsed.map((tech) => (
             <span
               key={tech}
-              className="px-1.5 py-0.5 rounded-md text-[10px] font-mono"
+              className="px-2 py-0.5 rounded-md text-xs font-mono"
               style={{
                 background: `oklch(0.25 0.06 ${hue} / 60%)`,
                 color: `oklch(0.75 0.1 ${hue})`,
@@ -100,7 +100,7 @@ function PipelineNode({ data }: { data: PipelineNodeData }) {
 
       {/* Files count badge */}
       <div
-        className="text-[10px] font-mono mt-1"
+        className="text-xs font-mono mt-1"
         style={{ color: `oklch(0.5 0.04 ${hue})` }}
       >
         {stage.filesInvolved.length} file

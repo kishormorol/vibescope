@@ -98,7 +98,7 @@ function DecisionCard({
       {/* Category badge */}
       <div className="pt-1">
         <span
-          className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium"
+          className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
           style={{
             background: `oklch(0.2 0.04 ${hue} / 50%)`,
             color: `oklch(0.75 0.1 ${hue})`,

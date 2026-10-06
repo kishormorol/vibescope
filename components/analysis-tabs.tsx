@@ -19,12 +19,12 @@ export function AnalysisTabs() {
 
   return (
     <div className="flex justify-center">
-      <div className="glass rounded-xl p-1 flex gap-0.5">
+      <div className="glass rounded-xl p-1.5 flex gap-1">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className="relative px-4 py-2.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2"
+            className="relative px-5 py-3 rounded-lg text-sm font-medium transition-all flex items-center gap-2.5"
           >
             {activeTab === tab.id && (
               <motion.div
