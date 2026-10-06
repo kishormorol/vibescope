@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useStore } from "@/lib/store";
+import { cacheAnalysis, clearCache } from "@/lib/cache";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,11 +15,47 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
+function TypingSubtitle() {
+  const text = "See how your code was built. Interactive visualization of the entire SWE pipeline \u2014 technologies, concepts, decisions, and learning paths.";
+  const [displayed, setDisplayed] = useState("");
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < text.length) {
+        setDisplayed(text.slice(0, i + 1));
+        i++;
+      } else {
+        setDone(true);
+        clearInterval(interval);
+      }
+    }, 18);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <motion.p
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.4 }}
+      className="text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed"
+    >
+      {displayed}
+      {!done && <span className="inline-block w-[2px] h-[1em] bg-[oklch(0.7_0.18_260)] ml-0.5 animate-pulse align-middle" />}
+    </motion.p>
+  );
+}
+
 export default function HomePage() {
-  const { repoUrl, setRepoUrl, setApiKey, setAnalysis } = useStore();
+  const { repoUrl, setRepoUrl, setApiKey, setAnalysis, cachedRepos, loadCachedRepos, loadFromCache } = useStore();
   const router = useRouter();
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [tempApiKey, setTempApiKey] = useState("");
+
+  useEffect(() => {
+    loadCachedRepos();
+  }, [loadCachedRepos]);
 
   const handleAnalyze = () => {
     if (!repoUrl.trim()) return;
@@ -39,7 +76,8 @@ export default function HomePage() {
         return;
       }
       const data = await res.json();
-      useStore.getState().setAnalysis(data);
+      const demoUrl = "demo/thinkdiff";
+      useStore.getState().setAnalysis(data, demoUrl);
       router.push("/analyze");
     } catch (err) {
       console.error("Demo load error:", err);
@@ -53,8 +91,11 @@ export default function HomePage() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="text-center space-y-8 max-w-3xl"
+        className="text-center space-y-8 max-w-3xl relative"
       >
+        {/* Animated gradient background for hero */}
+        <div className="absolute -inset-20 -z-10 rounded-3xl opacity-40 animate-gradient-shift" style={{ background: 'linear-gradient(135deg, oklch(0.2 0.08 260 / 30%), oklch(0.15 0.06 195 / 20%), oklch(0.2 0.08 300 / 25%), oklch(0.15 0.06 155 / 20%))', backgroundSize: '200% 200%', filter: 'blur(60px)' }} />
+
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -161,6 +202,50 @@ export default function HomePage() {
             </span>
           ))}
         </motion.div>
+
+        {/* Recent analyses from cache */}
+        {cachedRepos.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2 }}
+            className="pt-6 space-y-3 w-full max-w-xl mx-auto"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono text-muted-foreground/60 uppercase tracking-wider">
+                Recent
+              </span>
+              <button
+                onClick={async () => {
+                  await clearCache();
+                  loadCachedRepos();
+                }}
+                className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors font-mono"
+              >
+                Clear cache
+              </button>
+            </div>
+            <div className="space-y-1.5">
+              {cachedRepos.map((repo) => (
+                <button
+                  key={repo.url}
+                  onClick={async () => {
+                    const loaded = await loadFromCache(repo.url);
+                    if (loaded) router.push("/analyze");
+                  }}
+                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg glass hover:glow-primary transition-all group text-left"
+                >
+                  <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors truncate">
+                    {repo.name}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground/40 font-mono shrink-0 ml-3">
+                    {new Date(repo.timestamp).toLocaleDateString()}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </motion.div>
 
       {/* API Key Modal */}

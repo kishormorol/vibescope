@@ -33,6 +33,7 @@ export interface AnalyzedFile {
   concepts: string[];
   annotations: CodeAnnotation[];
   category: FileCategory;
+  sourceCode?: string;
 }
 
 export type FileCategory =

@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/lib/store";
 import type { AnalyzedFile, Difficulty } from "@/lib/types";
+import { FileAnatomy } from "./file-anatomy";
 
 const DIFFICULTY_COLORS: Record<Difficulty, { hue: string; label: string }> = {
   beginner: { hue: "155", label: "Beginner" },
@@ -244,10 +245,10 @@ export function FileExplorer() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.25 }}
-              className="p-5 space-y-5 overflow-y-auto h-full"
+              className="flex flex-col h-full overflow-hidden"
             >
               {/* Header */}
-              <div className="space-y-2">
+              <div className="space-y-2 px-5 pt-5 pb-3 border-b border-white/5 shrink-0">
                 <h2 className="text-lg font-semibold text-foreground font-mono">
                   {selected.path}
                 </h2>
@@ -263,82 +264,13 @@ export function FileExplorer() {
                 </div>
               </div>
 
-              {/* Summary */}
-              <div className="space-y-1.5">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Summary
-                </h3>
-                <p className="text-sm text-foreground/80 leading-relaxed">
-                  {selected.summary}
-                </p>
+              {/* File Anatomy */}
+              <div className="flex-1 overflow-hidden">
+                <FileAnatomy
+                  file={selected}
+                  sourceCode={selected.sourceCode}
+                />
               </div>
-
-              {/* Concepts */}
-              {selected.concepts.length > 0 && (
-                <div className="space-y-2">
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Concepts
-                  </h3>
-                  <div className="flex flex-wrap gap-1.5">
-                    {selected.concepts.map((conceptId) => (
-                      <button
-                        key={conceptId}
-                        onClick={() => setSelectedConcept(conceptId)}
-                        className="px-2.5 py-1 rounded-lg text-xs font-medium transition-all hover:scale-105"
-                        style={{
-                          background: "oklch(0.2 0.04 300 / 50%)",
-                          color: "oklch(0.8 0.1 300)",
-                          boxShadow: "0 0 8px oklch(0.6 0.1 300 / 15%)",
-                        }}
-                      >
-                        {conceptId}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Annotations */}
-              {selected.annotations.length > 0 && (
-                <div className="space-y-2">
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Annotations
-                  </h3>
-                  <div className="space-y-2">
-                    {selected.annotations.map((ann, i) => (
-                      <div
-                        key={i}
-                        className="p-3 rounded-lg border border-white/5 bg-white/[0.02] space-y-1"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-muted-foreground">
-                            L{ann.startLine}
-                            {ann.endLine !== ann.startLine &&
-                              `\u2013${ann.endLine}`}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {ann.conceptId}
-                          </span>
-                        </div>
-                        <p className="text-xs text-foreground/70 leading-relaxed">
-                          {ann.explanation}
-                        </p>
-                        {ann.docUrl && (
-                          <a
-                            href={ann.docUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] underline"
-                            style={{ color: "oklch(0.7 0.1 220)" }}
-                          >
-                            Documentation
-                          </a>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </motion.div>
           ) : (
             <motion.div
