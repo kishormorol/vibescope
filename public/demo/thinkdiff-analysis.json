@@ -1,0 +1,1297 @@
+{
+  "id": "thinkdiff-analysis-1",
+  "summary": {
+    "name": "ThinkDiff",
+    "description": "A comparative visualization tool for LLM reasoning traces. ThinkDiff sends the same prompt to multiple LLMs (Claude, DeepSeek R1, OpenAI o3), collects their reasoning and thinking traces, parses them into structured phases, and visualizes them side-by-side using React Flow for interactive tree-based exploration.",
+    "totalFiles": 39,
+    "totalLines": 7475,
+    "languages": [
+      {
+        "name": "TypeScript",
+        "percentage": 78
+      },
+      {
+        "name": "CSS",
+        "percentage": 15
+      },
+      {
+        "name": "JSON",
+        "percentage": 7
+      }
+    ],
+    "mainStack": "Next.js + React + TypeScript",
+    "complexity": "intermediate"
+  },
+  "files": [
+    {
+      "path": "app/page.tsx",
+      "language": "TypeScript",
+      "lines": 85,
+      "summary": "Landing page with a hero section, animated prompt input, and recent comparison history. Uses server components for initial render with client islands for interactivity.",
+      "difficulty": "beginner",
+      "concepts": [
+        "react-components",
+        "server-components",
+        "nextjs-routing"
+      ],
+      "annotations": [
+        {
+          "startLine": 1,
+          "endLine": 8,
+          "conceptId": "server-components",
+          "explanation": "This page is a React Server Component by default in Next.js App Router. It renders on the server and sends HTML to the client, reducing JavaScript bundle size.",
+          "docUrl": "https://nextjs.org/docs/app/building-your-application/rendering/server-components"
+        },
+        {
+          "startLine": 22,
+          "endLine": 45,
+          "conceptId": "react-components",
+          "explanation": "The hero section composes smaller components like PromptInput into a cohesive layout using JSX syntax and component composition patterns."
+        },
+        {
+          "startLine": 60,
+          "endLine": 80,
+          "conceptId": "css-glassmorphism",
+          "explanation": "The comparison history cards use backdrop-blur and semi-transparent backgrounds to create a frosted glass effect, a modern UI trend called glassmorphism."
+        }
+      ],
+      "category": "page"
+    },
+    {
+      "path": "app/layout.tsx",
+      "language": "TypeScript",
+      "lines": 42,
+      "summary": "Root layout defining the HTML shell, font loading with next/font, global metadata, and the shared navigation bar. Wraps all pages with theme and store providers.",
+      "difficulty": "beginner",
+      "concepts": [
+        "nextjs-routing",
+        "server-components"
+      ],
+      "annotations": [
+        {
+          "startLine": 1,
+          "endLine": 15,
+          "conceptId": "nextjs-routing",
+          "explanation": "The root layout.tsx is a required file in Next.js App Router. It wraps every page and defines the <html> and <body> tags. Layouts persist across navigations and don't re-render.",
+          "docUrl": "https://nextjs.org/docs/app/building-your-application/routing/layouts-and-templates"
+        },
+        {
+          "startLine": 18,
+          "endLine": 30,
+          "conceptId": "server-components",
+          "explanation": "Metadata exports like generateMetadata are server-only features that set page title, description, and Open Graph tags at the framework level."
+        }
+      ],
+      "category": "page"
+    },
+    {
+      "path": "app/globals.css",
+      "language": "CSS",
+      "lines": 245,
+      "summary": "Global stylesheet using Tailwind CSS v4 with @theme directive for custom design tokens. Defines oklch color palette, glassmorphism utility classes, animation keyframes, and React Flow node styling overrides.",
+      "difficulty": "beginner",
+      "concepts": [
+        "tailwind-css",
+        "css-glassmorphism",
+        "oklch-colors"
+      ],
+      "annotations": [
+        {
+          "startLine": 1,
+          "endLine": 35,
+          "conceptId": "tailwind-css",
+          "explanation": "Tailwind CSS v4 uses the @theme directive instead of tailwind.config.js to define design tokens like colors, spacing, and fonts directly in CSS.",
+          "docUrl": "https://tailwindcss.com/docs/theme"
+        },
+        {
+          "startLine": 38,
+          "endLine": 65,
+          "conceptId": "oklch-colors",
+          "explanation": "oklch() is a perceptually uniform color space. Unlike hex or hsl, oklch ensures consistent perceived brightness across different hues, making it ideal for generating harmonious color palettes."
+        },
+        {
+          "startLine": 120,
+          "endLine": 155,
+          "conceptId": "css-glassmorphism",
+          "explanation": "Custom utility classes combining backdrop-filter: blur(), semi-transparent backgrounds, and subtle borders create the glassmorphism card style used throughout the app."
+        }
+      ],
+      "category": "style"
+    },
+    {
+      "path": "app/compare/page.tsx",
+      "language": "TypeScript",
+      "lines": 210,
+      "summary": "Main comparison page that orchestrates the multi-LLM trace comparison workflow. Reads the prompt from URL search params, triggers parallel API calls, and renders the side-by-side comparison layout with synchronized scrolling.",
+      "difficulty": "intermediate",
+      "concepts": [
+        "client-components",
+        "react-hooks",
+        "zustand-store",
+        "parallel-execution"
+      ],
+      "annotations": [
+        {
+          "startLine": 1,
+          "endLine": 3,
+          "conceptId": "client-components",
+          "explanation": "The 'use client' directive marks this as a Client Component, enabling useState, useEffect, and browser APIs. It runs in the browser after hydration.",
+          "docUrl": "https://nextjs.org/docs/app/building-your-application/rendering/client-components"
+        },
+        {
+          "startLine": 28,
+          "endLine": 55,
+          "conceptId": "parallel-execution",
+          "explanation": "Promise.all fires requests to Claude, DeepSeek, and OpenAI simultaneously. This is significantly faster than sequential calls since LLM inference takes seconds per request."
+        },
+        {
+          "startLine": 72,
+          "endLine": 95,
+          "conceptId": "zustand-store",
+          "explanation": "The useTraceStore hook connects this component to the global Zustand store, reading trace data and dispatching actions without prop drilling through the component tree."
+        }
+      ],
+      "category": "page"
+    },
+    {
+      "path": "app/api/execute/route.ts",
+      "language": "TypeScript",
+      "lines": 165,
+      "summary": "API route handler that executes prompts against selected LLM providers. Validates the request body, dispatches to the appropriate provider module, and streams back the reasoning traces with proper error handling and timeout management.",
+      "difficulty": "intermediate",
+      "concepts": [
+        "api-routes",
+        "llm-integration",
+        "typescript-interfaces"
+      ],
+      "annotations": [
+        {
+          "startLine": 1,
+          "endLine": 20,
+          "conceptId": "api-routes",
+          "explanation": "Next.js App Router uses route.ts files with exported HTTP method handlers (GET, POST, etc.) instead of the older pages/api convention. Each handler receives a Request and returns a Response.",
+          "docUrl": "https://nextjs.org/docs/app/building-your-application/routing/route-handlers"
+        },
+        {
+          "startLine": 35,
+          "endLine": 70,
+          "conceptId": "llm-integration",
+          "explanation": "The execute function routes to different provider SDKs based on the model parameter. Each provider has its own authentication, request format, and response parsing logic."
+        },
+        {
+          "startLine": 85,
+          "endLine": 110,
+          "conceptId": "extended-thinking",
+          "explanation": "For Claude, the handler enables extended thinking mode which returns the model's internal reasoning chain alongside the final answer, giving visibility into how the model approached the problem."
+        }
+      ],
+      "category": "api"
+    },
+    {
+      "path": "app/api/parse/route.ts",
+      "language": "TypeScript",
+      "lines": 120,
+      "summary": "API route that takes raw reasoning traces from LLMs and parses them into structured phase objects. Identifies reasoning patterns like hypothesis formation, evidence gathering, backtracking, and conclusion synthesis.",
+      "difficulty": "intermediate",
+      "concepts": [
+        "api-routes",
+        "trace-parsing",
+        "typescript-interfaces"
+      ],
+      "annotations": [
+        {
+          "startLine": 15,
+          "endLine": 45,
+          "conceptId": "trace-parsing",
+          "explanation": "The parser uses regex patterns and heuristics to identify distinct reasoning phases in raw text. Different LLMs structure their thinking differently, so the parser adapts its strategy per provider."
+        },
+        {
+          "startLine": 55,
+          "endLine": 80,
+          "conceptId": "typescript-interfaces",
+          "explanation": "Strong TypeScript interfaces for ParsedTrace, ReasoningPhase, and PhaseType ensure type safety throughout the parsing pipeline and catch structural errors at compile time."
+        }
+      ],
+      "category": "api"
+    },
+    {
+      "path": "components/prompt-input.tsx",
+      "language": "TypeScript",
+      "lines": 135,
+      "summary": "Animated prompt input component with auto-resize textarea, model selector chips, and submit button. Uses Framer Motion for entrance animations and Zustand for persisting the selected models.",
+      "difficulty": "beginner",
+      "concepts": [
+        "react-components",
+        "client-components",
+        "framer-motion",
+        "react-hooks"
+      ],
+      "annotations": [
+        {
+          "startLine": 12,
+          "endLine": 35,
+          "conceptId": "framer-motion",
+          "explanation": "motion.div wraps the input card with spring-based entrance animation. The initial, animate, and transition props define the animation timeline declaratively.",
+          "docUrl": "https://motion.dev/docs/react-quick-start"
+        },
+        {
+          "startLine": 45,
+          "endLine": 68,
+          "conceptId": "react-hooks",
+          "explanation": "useRef tracks the textarea DOM element for auto-resize logic, while useState manages the input value. useCallback memoizes the submit handler to prevent unnecessary re-renders of child components."
+        }
+      ],
+      "category": "component"
+    },
+    {
+      "path": "components/trace-panel.tsx",
+      "language": "TypeScript",
+      "lines": 198,
+      "summary": "Individual trace display panel showing one LLM's reasoning output. Renders the raw trace text with syntax highlighting via Shiki, phase markers, and expandable sections for each reasoning step.",
+      "difficulty": "intermediate",
+      "concepts": [
+        "react-components",
+        "client-components",
+        "react-hooks"
+      ],
+      "annotations": [
+        {
+          "startLine": 25,
+          "endLine": 55,
+          "conceptId": "react-components",
+          "explanation": "TracePanel receives the parsed trace data as props and renders a scrollable panel with collapsible reasoning phases. Each phase is color-coded by type (hypothesis, evidence, conclusion)."
+        },
+        {
+          "startLine": 80,
+          "endLine": 120,
+          "conceptId": "client-components",
+          "explanation": "Interactivity like expanding/collapsing phases and hover tooltips requires client-side state and event handlers, making this a 'use client' component."
+        }
+      ],
+      "category": "component"
+    },
+    {
+      "path": "components/trace-tree.tsx",
+      "language": "TypeScript",
+      "lines": 285,
+      "summary": "React Flow-based tree visualization of reasoning traces. Converts parsed reasoning phases into a directed graph with custom nodes showing phase type, content preview, and confidence scores. Supports zoom, pan, and click-to-expand.",
+      "difficulty": "advanced",
+      "concepts": [
+        "react-flow",
+        "react-components",
+        "client-components"
+      ],
+      "annotations": [
+        {
+          "startLine": 15,
+          "endLine": 50,
+          "conceptId": "react-flow",
+          "explanation": "ReactFlow renders an interactive node graph. Custom node types are registered via nodeTypes prop, and the layout is computed using a tree layout algorithm that positions nodes based on their depth and parent relationships.",
+          "docUrl": "https://reactflow.dev/learn"
+        },
+        {
+          "startLine": 65,
+          "endLine": 100,
+          "conceptId": "react-flow",
+          "explanation": "Edges between nodes represent reasoning flow. The animated edge style with gradient coloring shows the direction and strength of logical connections between reasoning phases."
+        },
+        {
+          "startLine": 130,
+          "endLine": 175,
+          "conceptId": "react-components",
+          "explanation": "Custom React Flow nodes are regular React components that receive node data as props. They can contain any React content including icons, progress bars, and interactive elements."
+        }
+      ],
+      "category": "component"
+    },
+    {
+      "path": "components/comparison-view.tsx",
+      "language": "TypeScript",
+      "lines": 178,
+      "summary": "Side-by-side comparison layout that displays multiple LLM trace panels in synchronized columns. Handles responsive layout, panel resizing, and coordinated scroll position across panels.",
+      "difficulty": "intermediate",
+      "concepts": [
+        "react-components",
+        "client-components",
+        "zustand-store",
+        "react-hooks"
+      ],
+      "annotations": [
+        {
+          "startLine": 20,
+          "endLine": 48,
+          "conceptId": "zustand-store",
+          "explanation": "The comparison view reads all loaded traces from the Zustand store and maps them into panel components. Store selectors ensure the component only re-renders when trace data changes, not on every store update."
+        },
+        {
+          "startLine": 60,
+          "endLine": 95,
+          "conceptId": "react-hooks",
+          "explanation": "A custom useSyncScroll hook coordinates scroll positions across panels using refs and scroll event listeners, creating the synchronized side-by-side viewing experience."
+        }
+      ],
+      "category": "component"
+    },
+    {
+      "path": "components/aligned-comparison.tsx",
+      "language": "TypeScript",
+      "lines": 220,
+      "summary": "Advanced comparison mode that aligns reasoning phases across different LLMs by semantic similarity. Highlights where models agree, diverge, or take entirely different reasoning paths. Uses the alignment algorithm from lib/parser/alignment.ts.",
+      "difficulty": "advanced",
+      "concepts": [
+        "react-components",
+        "trace-alignment",
+        "react-hooks"
+      ],
+      "annotations": [
+        {
+          "startLine": 30,
+          "endLine": 65,
+          "conceptId": "trace-alignment",
+          "explanation": "The aligned view maps corresponding reasoning phases across LLMs. Phases are matched using a scoring function that considers phase type, content similarity, and position in the reasoning chain."
+        },
+        {
+          "startLine": 100,
+          "endLine": 140,
+          "conceptId": "react-components",
+          "explanation": "Divergence highlights use color-coded backgrounds: green for agreement, yellow for partial overlap, and red for complete divergence, giving an instant visual summary of where models think differently."
+        }
+      ],
+      "category": "component"
+    },
+    {
+      "path": "components/metrics-dashboard.tsx",
+      "language": "TypeScript",
+      "lines": 195,
+      "summary": "Dashboard displaying quantitative metrics about reasoning traces: token counts, reasoning depth, phase distribution charts, and divergence scores between models. Uses animated number counters and bar charts.",
+      "difficulty": "intermediate",
+      "concepts": [
+        "react-components",
+        "framer-motion",
+        "client-components"
+      ],
+      "annotations": [
+        {
+          "startLine": 25,
+          "endLine": 60,
+          "conceptId": "framer-motion",
+          "explanation": "Animated counters use Framer Motion's useMotionValue and useTransform to smoothly interpolate from 0 to the final metric value, creating a satisfying reveal effect when the dashboard loads."
+        },
+        {
+          "startLine": 80,
+          "endLine": 120,
+          "conceptId": "react-components",
+          "explanation": "Bar chart components render using pure CSS with width percentages calculated from normalized data. This avoids the overhead of a charting library for simple horizontal bar visualizations."
+        }
+      ],
+      "category": "component"
+    },
+    {
+      "path": "lib/store.ts",
+      "language": "TypeScript",
+      "lines": 145,
+      "summary": "Global state store using Zustand. Manages trace data for all LLM providers, UI state (selected models, active panel, comparison mode), and derived state like alignment results and divergence scores.",
+      "difficulty": "intermediate",
+      "concepts": [
+        "zustand-store",
+        "typescript-interfaces",
+        "react-hooks"
+      ],
+      "annotations": [
+        {
+          "startLine": 1,
+          "endLine": 30,
+          "conceptId": "zustand-store",
+          "explanation": "Zustand creates a store with create() that returns a hook. Unlike Redux, there's no boilerplate: no action types, reducers, or dispatch. State updates are simple function calls that produce the next state.",
+          "docUrl": "https://zustand.docs.pmnd.rs/getting-started/introduction"
+        },
+        {
+          "startLine": 45,
+          "endLine": 75,
+          "conceptId": "typescript-interfaces",
+          "explanation": "The store's type is defined as an interface, ensuring all state slices and actions are typed. This catches bugs like accessing a misspelled property or passing wrong arguments to an action."
+        },
+        {
+          "startLine": 90,
+          "endLine": 120,
+          "conceptId": "zustand-store",
+          "explanation": "Zustand's subscribeWithSelector middleware enables fine-grained subscriptions. Components can subscribe to specific state slices to avoid re-rendering when unrelated state changes."
+        }
+      ],
+      "category": "lib"
+    },
+    {
+      "path": "lib/parser/llm-parser.ts",
+      "language": "TypeScript",
+      "lines": 310,
+      "summary": "Core parsing engine that transforms raw LLM reasoning text into structured phase trees. Implements provider-specific parsing strategies for Claude's extended thinking XML, DeepSeek's <think> blocks, and OpenAI's reasoning tokens. Detects phase types like hypothesis, analysis, backtracking, and synthesis.",
+      "difficulty": "advanced",
+      "concepts": [
+        "trace-parsing",
+        "typescript-interfaces",
+        "extended-thinking"
+      ],
+      "annotations": [
+        {
+          "startLine": 15,
+          "endLine": 50,
+          "conceptId": "trace-parsing",
+          "explanation": "The parser factory selects a strategy based on the LLM provider. Each strategy knows the provider's specific trace format: Claude uses XML-like thinking blocks, DeepSeek uses <think> tags, and OpenAI returns structured reasoning tokens."
+        },
+        {
+          "startLine": 80,
+          "endLine": 130,
+          "conceptId": "extended-thinking",
+          "explanation": "Extended thinking in Claude returns the model's internal chain-of-thought as structured content blocks. The parser extracts these blocks, identifies reasoning phases by content patterns, and builds a tree structure representing the reasoning flow."
+        },
+        {
+          "startLine": 180,
+          "endLine": 230,
+          "conceptId": "typescript-interfaces",
+          "explanation": "Discriminated unions (type: 'hypothesis' | 'evidence' | 'conclusion') enable exhaustive pattern matching in switch statements, ensuring every phase type is handled correctly."
+        }
+      ],
+      "category": "lib"
+    },
+    {
+      "path": "lib/parser/alignment.ts",
+      "language": "TypeScript",
+      "lines": 185,
+      "summary": "Alignment algorithm that matches corresponding reasoning phases across different LLM traces. Uses a scoring matrix based on phase type similarity, content overlap (Jaccard index on token sets), and positional proximity. Produces aligned phase pairs with divergence scores.",
+      "difficulty": "advanced",
+      "concepts": [
+        "trace-alignment",
+        "typescript-interfaces"
+      ],
+      "annotations": [
+        {
+          "startLine": 20,
+          "endLine": 60,
+          "conceptId": "trace-alignment",
+          "explanation": "The alignment algorithm builds a scoring matrix comparing every phase from trace A against every phase from trace B. It then uses a greedy matching approach to find the best one-to-one mapping that maximizes total alignment score."
+        },
+        {
+          "startLine": 90,
+          "endLine": 130,
+          "conceptId": "trace-alignment",
+          "explanation": "Divergence scoring quantifies how differently two aligned phases reason about the same sub-problem. High divergence indicates the models took fundamentally different approaches, which is the most interesting finding for users."
+        }
+      ],
+      "category": "lib"
+    },
+    {
+      "path": "lib/parser/types.ts",
+      "language": "TypeScript",
+      "lines": 95,
+      "summary": "Type definitions for the trace parsing system. Defines interfaces for raw traces, parsed phases, phase types, alignment results, and divergence metrics. Serves as the contract between parser, alignment, and visualization layers.",
+      "difficulty": "beginner",
+      "concepts": [
+        "typescript-interfaces"
+      ],
+      "annotations": [
+        {
+          "startLine": 1,
+          "endLine": 40,
+          "conceptId": "typescript-interfaces",
+          "explanation": "These interfaces define the shape of data flowing through the entire app. By defining types centrally, all modules agree on the data contract, and TypeScript catches mismatches at compile time rather than runtime.",
+          "docUrl": "https://www.typescriptlang.org/docs/handbook/2/objects.html"
+        }
+      ],
+      "category": "type"
+    },
+    {
+      "path": "lib/providers/claude.ts",
+      "language": "TypeScript",
+      "lines": 120,
+      "summary": "Claude provider module using @anthropic-ai/sdk. Sends prompts with extended thinking enabled, handles streaming responses, extracts thinking blocks from the response content, and normalizes the output into the common trace format.",
+      "difficulty": "intermediate",
+      "concepts": [
+        "llm-integration",
+        "extended-thinking",
+        "typescript-interfaces"
+      ],
+      "annotations": [
+        {
+          "startLine": 8,
+          "endLine": 35,
+          "conceptId": "llm-integration",
+          "explanation": "The Anthropic SDK client is initialized with the API key from environment variables. The messages.create call specifies the model, max tokens, and enables extended thinking with a thinking budget.",
+          "docUrl": "https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking"
+        },
+        {
+          "startLine": 50,
+          "endLine": 85,
+          "conceptId": "extended-thinking",
+          "explanation": "When extended thinking is enabled, the response contains 'thinking' content blocks in addition to the regular 'text' blocks. These thinking blocks expose the model's internal reasoning chain."
+        }
+      ],
+      "category": "lib"
+    },
+    {
+      "path": "lib/providers/deepseek.ts",
+      "language": "TypeScript",
+      "lines": 95,
+      "summary": "DeepSeek R1 provider using the OpenAI-compatible API. Sends prompts and extracts reasoning from the <think>...</think> tags that DeepSeek R1 wraps its chain-of-thought in.",
+      "difficulty": "intermediate",
+      "concepts": [
+        "llm-integration",
+        "extended-thinking"
+      ],
+      "annotations": [
+        {
+          "startLine": 10,
+          "endLine": 40,
+          "conceptId": "llm-integration",
+          "explanation": "DeepSeek R1 uses an OpenAI-compatible API, so it can be accessed through the OpenAI SDK with a custom baseURL pointing to DeepSeek's API endpoint."
+        },
+        {
+          "startLine": 55,
+          "endLine": 80,
+          "conceptId": "extended-thinking",
+          "explanation": "DeepSeek R1 embeds its reasoning within <think> XML tags in the response. The provider extracts content between these tags to get the raw reasoning trace."
+        }
+      ],
+      "category": "lib"
+    },
+    {
+      "path": "lib/providers/openai.ts",
+      "language": "TypeScript",
+      "lines": 105,
+      "summary": "OpenAI o3 provider using the official SDK. Configures the reasoning effort parameter, extracts reasoning tokens from the response, and maps them to the common trace format.",
+      "difficulty": "intermediate",
+      "concepts": [
+        "llm-integration",
+        "extended-thinking"
+      ],
+      "annotations": [
+        {
+          "startLine": 8,
+          "endLine": 35,
+          "conceptId": "llm-integration",
+          "explanation": "The OpenAI SDK is configured with the API key and the o3 model. The reasoning_effort parameter controls how much compute the model spends on internal reasoning before responding.",
+          "docUrl": "https://platform.openai.com/docs/guides/reasoning"
+        },
+        {
+          "startLine": 50,
+          "endLine": 80,
+          "conceptId": "extended-thinking",
+          "explanation": "OpenAI's reasoning models return reasoning tokens as part of the response usage metadata. The actual reasoning content may be available through the response's reasoning field depending on the API version."
+        }
+      ],
+      "category": "lib"
+    }
+  ],
+  "technologies": [
+    {
+      "id": "nextjs",
+      "name": "Next.js",
+      "category": "framework",
+      "description": "React framework with file-based routing, server components, API routes, and built-in optimizations for production. Provides the full-stack foundation with server-side rendering and static generation.",
+      "whyChosen": "Provides both the frontend React framework and backend API routes in one unified project, eliminating the need for a separate server. Server components reduce client-side JavaScript for faster initial load.",
+      "officialUrl": "https://nextjs.org",
+      "docsUrl": "https://nextjs.org/docs",
+      "version": "16"
+    },
+    {
+      "id": "react",
+      "name": "React",
+      "category": "framework",
+      "description": "Declarative UI library for building component-based interfaces. React 19 introduces improved server components, concurrent features, and the use() hook for resource loading.",
+      "whyChosen": "Industry-standard component model with the largest ecosystem. React 19's server components enable sending less JavaScript to the browser, important for a visualization-heavy app.",
+      "officialUrl": "https://react.dev",
+      "docsUrl": "https://react.dev/learn",
+      "version": "19"
+    },
+    {
+      "id": "typescript",
+      "name": "TypeScript",
+      "category": "language",
+      "description": "Typed superset of JavaScript that compiles to plain JS. Adds static type checking, interfaces, generics, and IDE-powered autocomplete to catch bugs before runtime.",
+      "whyChosen": "Essential for a project with complex data structures like reasoning traces and alignment matrices. TypeScript catches type mismatches between the parser, store, and UI layers at compile time.",
+      "officialUrl": "https://www.typescriptlang.org",
+      "docsUrl": "https://www.typescriptlang.org/docs"
+    },
+    {
+      "id": "react-flow",
+      "name": "@xyflow/react",
+      "category": "visualization",
+      "description": "Library for building interactive node-based UIs, diagrams, and graphs in React. Supports custom nodes, edges, layouts, zoom, pan, and minimap out of the box.",
+      "whyChosen": "Purpose-built for the tree visualization of reasoning traces. Unlike D3, React Flow uses React components for nodes, making it natural to integrate with the rest of the app. Built-in interactivity (zoom, pan, selection) saves significant development time.",
+      "officialUrl": "https://reactflow.dev",
+      "docsUrl": "https://reactflow.dev/learn"
+    },
+    {
+      "id": "zustand",
+      "name": "Zustand",
+      "category": "state",
+      "description": "Lightweight state management library for React. Creates stores as hooks with no boilerplate, supporting middleware, selectors, and subscriptions.",
+      "whyChosen": "Minimal API surface compared to Redux while providing all needed features: shared state across components, selective re-renders via selectors, and middleware for persistence. The hook-based API feels natural in a React codebase.",
+      "officialUrl": "https://zustand.docs.pmnd.rs",
+      "docsUrl": "https://zustand.docs.pmnd.rs/getting-started/introduction"
+    },
+    {
+      "id": "framer-motion",
+      "name": "Framer Motion",
+      "category": "animation",
+      "description": "Production-ready animation library for React. Provides declarative animations, layout transitions, gesture handling, and spring physics with a simple component API.",
+      "whyChosen": "Makes complex animations simple with declarative props (initial, animate, exit). The comparison view needs smooth transitions when switching between traces, and the metrics dashboard benefits from animated number counters.",
+      "officialUrl": "https://motion.dev",
+      "docsUrl": "https://motion.dev/docs/react-quick-start"
+    },
+    {
+      "id": "shadcn-ui",
+      "name": "shadcn/ui",
+      "category": "styling",
+      "description": "Collection of reusable UI components built with Radix UI primitives and styled with Tailwind CSS. Components are copied into your project for full customization rather than installed as a dependency.",
+      "whyChosen": "Provides accessible, well-designed base components (buttons, dialogs, tabs) without locking into a component library. Since components live in the project, they can be customized to match the glassmorphism design language.",
+      "officialUrl": "https://ui.shadcn.com",
+      "docsUrl": "https://ui.shadcn.com/docs"
+    },
+    {
+      "id": "tailwind-css",
+      "name": "Tailwind CSS",
+      "category": "styling",
+      "description": "Utility-first CSS framework that provides low-level classes for building custom designs. Version 4 introduces CSS-first configuration with the @theme directive and native CSS nesting.",
+      "whyChosen": "Utility classes enable rapid UI iteration without context-switching to CSS files. Tailwind v4's @theme directive allows defining the oklch color palette and glassmorphism tokens directly in CSS, keeping design decisions centralized.",
+      "officialUrl": "https://tailwindcss.com",
+      "docsUrl": "https://tailwindcss.com/docs",
+      "version": "4"
+    },
+    {
+      "id": "anthropic-sdk",
+      "name": "@anthropic-ai/sdk",
+      "category": "api",
+      "description": "Official TypeScript SDK for the Anthropic API. Provides typed methods for message creation, streaming, and extended thinking with Claude models.",
+      "whyChosen": "Required for accessing Claude's extended thinking feature, which exposes the model's reasoning chain. The official SDK provides TypeScript types for all API responses, ensuring type safety when parsing thinking blocks.",
+      "officialUrl": "https://docs.anthropic.com",
+      "docsUrl": "https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking"
+    },
+    {
+      "id": "openai-sdk",
+      "name": "OpenAI SDK",
+      "category": "api",
+      "description": "Official TypeScript SDK for the OpenAI API. Supports chat completions, reasoning models, streaming, and function calling. Also serves as a client for OpenAI-compatible APIs like DeepSeek.",
+      "whyChosen": "Needed for OpenAI o3 reasoning model access and also used as the client for DeepSeek R1, which exposes an OpenAI-compatible API. One SDK covers two providers.",
+      "officialUrl": "https://platform.openai.com",
+      "docsUrl": "https://platform.openai.com/docs/api-reference"
+    },
+    {
+      "id": "shiki",
+      "name": "Shiki",
+      "category": "tooling",
+      "description": "Syntax highlighter powered by TextMate grammars, the same engine used in VS Code. Produces accurate, richly colored code highlighting for any language.",
+      "whyChosen": "Used to syntax-highlight code snippets that appear within LLM reasoning traces. Shiki's VS Code-quality highlighting makes code blocks in traces readable and visually distinct from natural language reasoning text.",
+      "officialUrl": "https://shiki.style",
+      "docsUrl": "https://shiki.style/guide"
+    }
+  ],
+  "pipeline": [
+    {
+      "id": "setup",
+      "order": 1,
+      "label": "Project Setup",
+      "description": "Initialize the Next.js 16 project with TypeScript, configure Tailwind CSS v4 with oklch color tokens, and install shadcn/ui base components. Set up the project structure with app directory routing.",
+      "filesInvolved": [
+        "app/layout.tsx",
+        "app/globals.css",
+        "app/page.tsx"
+      ],
+      "technologiesUsed": [
+        "nextjs",
+        "tailwind-css",
+        "shadcn-ui",
+        "typescript"
+      ],
+      "icon": "🚀"
+    },
+    {
+      "id": "data-model",
+      "order": 2,
+      "label": "Data Model",
+      "description": "Define TypeScript interfaces for reasoning traces, parsed phases, alignment results, and application state. Create the Zustand store with typed state slices and actions for managing trace data across components.",
+      "filesInvolved": [
+        "lib/parser/types.ts",
+        "lib/store.ts"
+      ],
+      "technologiesUsed": [
+        "typescript",
+        "zustand"
+      ],
+      "icon": "🗃️"
+    },
+    {
+      "id": "api-layer",
+      "order": 3,
+      "label": "API Layer",
+      "description": "Build provider modules for Claude, DeepSeek R1, and OpenAI o3 with their respective SDKs. Create Next.js route handlers for executing prompts and parsing traces, with error handling and timeout management.",
+      "filesInvolved": [
+        "lib/providers/claude.ts",
+        "lib/providers/deepseek.ts",
+        "lib/providers/openai.ts",
+        "app/api/execute/route.ts",
+        "app/api/parse/route.ts"
+      ],
+      "technologiesUsed": [
+        "nextjs",
+        "anthropic-sdk",
+        "openai-sdk",
+        "typescript"
+      ],
+      "icon": "☁️"
+    },
+    {
+      "id": "core-logic",
+      "order": 4,
+      "label": "Core Logic",
+      "description": "Implement the trace parsing engine that transforms raw LLM output into structured phase trees. Build the alignment algorithm that matches corresponding reasoning phases across different models and computes divergence scores.",
+      "filesInvolved": [
+        "lib/parser/llm-parser.ts",
+        "lib/parser/alignment.ts"
+      ],
+      "technologiesUsed": [
+        "typescript"
+      ],
+      "icon": "⚙️"
+    },
+    {
+      "id": "ui-components",
+      "order": 5,
+      "label": "UI Components",
+      "description": "Build the interactive UI layer: prompt input with model selection, individual trace display panels, side-by-side comparison views with synchronized scrolling, and the aligned comparison mode with divergence highlighting.",
+      "filesInvolved": [
+        "components/prompt-input.tsx",
+        "components/trace-panel.tsx",
+        "components/comparison-view.tsx",
+        "components/aligned-comparison.tsx",
+        "components/phase-timeline.tsx"
+      ],
+      "technologiesUsed": [
+        "react",
+        "shadcn-ui",
+        "tailwind-css",
+        "framer-motion",
+        "zustand"
+      ],
+      "icon": "🎨"
+    },
+    {
+      "id": "visualization",
+      "order": 6,
+      "label": "Visualization",
+      "description": "Add the React Flow tree visualization for reasoning traces, the animated reasoning replay feature, and the metrics dashboard with animated counters and distribution charts. Polish with glassmorphism styling and spring animations.",
+      "filesInvolved": [
+        "components/trace-tree.tsx",
+        "components/reasoning-replay.tsx",
+        "components/metrics-dashboard.tsx"
+      ],
+      "technologiesUsed": [
+        "react-flow",
+        "framer-motion",
+        "shiki",
+        "tailwind-css"
+      ],
+      "icon": "📊"
+    }
+  ],
+  "concepts": [
+    {
+      "id": "react-components",
+      "name": "React Components",
+      "category": "Frontend",
+      "difficulty": "beginner",
+      "explanation": "Components are the building blocks of React UIs. Each component is a JavaScript function that returns JSX (a syntax extension that looks like HTML). Components accept inputs called props, can maintain internal state, and compose together to build complex interfaces. In ThinkDiff, every UI element from the prompt input to the trace tree nodes is a component.",
+      "docUrl": "https://react.dev/learn/your-first-component",
+      "prerequisites": []
+    },
+    {
+      "id": "react-hooks",
+      "name": "React Hooks",
+      "category": "Frontend",
+      "difficulty": "beginner",
+      "explanation": "Hooks are functions that let components use React features like state (useState), side effects (useEffect), refs (useRef), and memoization (useMemo, useCallback). They replace the older class component lifecycle methods with a simpler, composable API. Custom hooks like useSyncScroll encapsulate reusable logic.",
+      "docUrl": "https://react.dev/reference/react/hooks",
+      "prerequisites": [
+        "react-components"
+      ]
+    },
+    {
+      "id": "typescript-interfaces",
+      "name": "TypeScript Interfaces",
+      "category": "Language",
+      "difficulty": "beginner",
+      "explanation": "Interfaces define the shape of objects in TypeScript, specifying what properties exist and their types. They act as contracts between different parts of the codebase. In ThinkDiff, interfaces like ParsedTrace, ReasoningPhase, and AlignmentResult ensure that data flowing from the parser to the store to the UI maintains the correct structure.",
+      "docUrl": "https://www.typescriptlang.org/docs/handbook/2/objects.html",
+      "prerequisites": []
+    },
+    {
+      "id": "server-components",
+      "name": "Server Components",
+      "category": "Frontend",
+      "difficulty": "intermediate",
+      "explanation": "React Server Components (RSC) render on the server and send HTML to the client with zero JavaScript overhead. They can directly access server resources like databases and file systems. In Next.js App Router, components are server components by default. ThinkDiff's landing page and layout use server components for fast initial loads.",
+      "docUrl": "https://nextjs.org/docs/app/building-your-application/rendering/server-components",
+      "prerequisites": [
+        "react-components"
+      ]
+    },
+    {
+      "id": "client-components",
+      "name": "Client Components",
+      "category": "Frontend",
+      "difficulty": "intermediate",
+      "explanation": "Client Components run in the browser and can use interactive features like useState, useEffect, and event handlers. Marked with 'use client' at the top of the file. In ThinkDiff, interactive elements like the trace panels, comparison views, and React Flow visualizations must be client components because they respond to user input.",
+      "docUrl": "https://nextjs.org/docs/app/building-your-application/rendering/client-components",
+      "prerequisites": [
+        "react-components",
+        "server-components"
+      ]
+    },
+    {
+      "id": "nextjs-routing",
+      "name": "Next.js App Router",
+      "category": "Frontend",
+      "difficulty": "beginner",
+      "explanation": "Next.js App Router uses file-system based routing where folders define URL segments. Special files like page.tsx (route content), layout.tsx (shared UI), and route.ts (API endpoints) have specific roles. ThinkDiff uses this for the home page (/), compare page (/compare), and API routes (/api/execute, /api/parse).",
+      "docUrl": "https://nextjs.org/docs/app/building-your-application/routing",
+      "prerequisites": [
+        "react-components"
+      ]
+    },
+    {
+      "id": "api-routes",
+      "name": "API Routes (Route Handlers)",
+      "category": "Backend",
+      "difficulty": "intermediate",
+      "explanation": "Route handlers in Next.js App Router are server-side functions that handle HTTP requests. Defined in route.ts files, they export functions named after HTTP methods (GET, POST). ThinkDiff's /api/execute route accepts a prompt and model selection, calls the LLM provider, and returns the reasoning trace.",
+      "docUrl": "https://nextjs.org/docs/app/building-your-application/routing/route-handlers",
+      "prerequisites": [
+        "nextjs-routing",
+        "typescript-interfaces"
+      ]
+    },
+    {
+      "id": "zustand-store",
+      "name": "Zustand State Management",
+      "category": "State",
+      "difficulty": "intermediate",
+      "explanation": "Zustand creates global state stores as React hooks with minimal boilerplate. A store is defined by passing a function that returns the initial state and actions to create(). Components access state by calling the store hook with an optional selector. ThinkDiff's store manages trace data, selected models, and UI state like the active comparison mode.",
+      "docUrl": "https://zustand.docs.pmnd.rs/getting-started/introduction",
+      "prerequisites": [
+        "react-hooks"
+      ]
+    },
+    {
+      "id": "react-flow",
+      "name": "React Flow Graphs",
+      "category": "Visualization",
+      "difficulty": "advanced",
+      "explanation": "React Flow renders interactive node-based graphs where nodes and edges are React components. Nodes are positioned on a canvas that supports zoom, pan, and selection. Custom node types display any React content. ThinkDiff uses React Flow to visualize reasoning traces as trees where each node is a reasoning phase connected by logical flow edges.",
+      "docUrl": "https://reactflow.dev/learn",
+      "prerequisites": [
+        "react-components",
+        "react-hooks",
+        "client-components"
+      ]
+    },
+    {
+      "id": "llm-integration",
+      "name": "LLM API Integration",
+      "category": "Backend",
+      "difficulty": "intermediate",
+      "explanation": "Integrating with LLM APIs involves initializing SDK clients with API keys, constructing properly formatted request payloads, handling streaming or blocking responses, and normalizing outputs across different providers. ThinkDiff integrates with three different LLM APIs, each with its own SDK and response format.",
+      "docUrl": "https://docs.anthropic.com/en/docs/build-with-claude/overview",
+      "prerequisites": [
+        "api-routes",
+        "typescript-interfaces"
+      ]
+    },
+    {
+      "id": "extended-thinking",
+      "name": "Extended Thinking / Reasoning Traces",
+      "category": "AI",
+      "difficulty": "advanced",
+      "explanation": "Extended thinking is a capability of advanced LLMs that exposes the model's internal reasoning process. Claude uses thinking content blocks, DeepSeek R1 uses <think> tags, and OpenAI o3 uses reasoning tokens. These traces show how models break down problems, form hypotheses, evaluate evidence, and reach conclusions. ThinkDiff's core value is making these traces comparable.",
+      "docUrl": "https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking",
+      "prerequisites": [
+        "llm-integration"
+      ]
+    },
+    {
+      "id": "trace-parsing",
+      "name": "Trace Parsing & Phase Detection",
+      "category": "Core Logic",
+      "difficulty": "advanced",
+      "explanation": "Trace parsing transforms unstructured reasoning text into structured phase objects. The parser identifies reasoning patterns like hypothesis formation, evidence gathering, analysis, backtracking, and conclusion synthesis. Different LLMs format their thinking differently, so the parser uses provider-specific strategies with a common output interface.",
+      "docUrl": "https://www.typescriptlang.org/docs/handbook/2/narrowing.html",
+      "prerequisites": [
+        "extended-thinking",
+        "typescript-interfaces"
+      ]
+    },
+    {
+      "id": "trace-alignment",
+      "name": "Cross-Model Trace Alignment",
+      "category": "Core Logic",
+      "difficulty": "advanced",
+      "explanation": "Trace alignment matches corresponding reasoning phases across different LLM outputs for the same prompt. It builds a scoring matrix based on phase type similarity, content overlap, and positional proximity, then finds the optimal one-to-one mapping. This enables the side-by-side aligned comparison view that highlights where models agree or diverge.",
+      "docUrl": "https://en.wikipedia.org/wiki/Sequence_alignment",
+      "prerequisites": [
+        "trace-parsing"
+      ]
+    },
+    {
+      "id": "tailwind-css",
+      "name": "Tailwind CSS Utility Classes",
+      "category": "Styling",
+      "difficulty": "beginner",
+      "explanation": "Tailwind CSS provides utility classes like flex, p-4, text-lg, and bg-blue-500 that you compose directly in HTML/JSX instead of writing custom CSS. Version 4 introduces the @theme directive for defining design tokens in CSS. ThinkDiff uses Tailwind for all component styling, with custom utilities for glassmorphism effects.",
+      "docUrl": "https://tailwindcss.com/docs/utility-first",
+      "prerequisites": []
+    },
+    {
+      "id": "css-glassmorphism",
+      "name": "CSS Glassmorphism",
+      "category": "Styling",
+      "difficulty": "beginner",
+      "explanation": "Glassmorphism is a UI design style that creates a frosted glass effect using backdrop-filter: blur(), semi-transparent backgrounds, and subtle borders. It adds depth and hierarchy to interfaces. ThinkDiff uses glassmorphism for card components, panels, and overlays to create a modern, layered visual aesthetic.",
+      "docUrl": "https://developer.mozilla.org/en-US/docs/Web/CSS/backdrop-filter",
+      "prerequisites": [
+        "tailwind-css"
+      ]
+    },
+    {
+      "id": "oklch-colors",
+      "name": "oklch Color Space",
+      "category": "Styling",
+      "difficulty": "intermediate",
+      "explanation": "oklch() is a perceptually uniform color function where L is lightness, C is chroma (saturation), and H is hue. Unlike hex or HSL, changing the hue in oklch maintains consistent perceived brightness, making it ideal for generating accessible, harmonious color palettes. ThinkDiff defines its entire color system in oklch for consistent contrast ratios.",
+      "docUrl": "https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch",
+      "prerequisites": [
+        "tailwind-css"
+      ]
+    },
+    {
+      "id": "framer-motion",
+      "name": "Framer Motion Animations",
+      "category": "Animation",
+      "difficulty": "intermediate",
+      "explanation": "Framer Motion provides React components like motion.div that accept animation props. The initial prop sets the starting state, animate sets the target, and transition controls timing (spring, tween, duration). AnimatePresence handles exit animations. ThinkDiff uses it for page transitions, panel reveals, and animated metric counters.",
+      "docUrl": "https://motion.dev/docs/react-quick-start",
+      "prerequisites": [
+        "react-components",
+        "client-components"
+      ]
+    },
+    {
+      "id": "parallel-execution",
+      "name": "Promise.all Parallel Execution",
+      "category": "JavaScript",
+      "difficulty": "intermediate",
+      "explanation": "Promise.all takes an array of promises and runs them concurrently, resolving when all complete. This is much faster than awaiting each promise sequentially. ThinkDiff uses Promise.all to fire requests to Claude, DeepSeek, and OpenAI simultaneously, reducing total wait time from the sum of all response times to just the slowest one.",
+      "docUrl": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all",
+      "prerequisites": [
+        "react-hooks"
+      ]
+    }
+  ],
+  "conceptEdges": [
+    {
+      "from": "react-components",
+      "to": "react-hooks",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "react-components",
+      "to": "server-components",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "react-components",
+      "to": "client-components",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "react-components",
+      "to": "nextjs-routing",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "react-components",
+      "to": "react-flow",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "react-components",
+      "to": "framer-motion",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "react-hooks",
+      "to": "zustand-store",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "react-hooks",
+      "to": "react-flow",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "react-hooks",
+      "to": "parallel-execution",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "server-components",
+      "to": "client-components",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "client-components",
+      "to": "react-flow",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "client-components",
+      "to": "framer-motion",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "typescript-interfaces",
+      "to": "api-routes",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "typescript-interfaces",
+      "to": "llm-integration",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "typescript-interfaces",
+      "to": "trace-parsing",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "nextjs-routing",
+      "to": "api-routes",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "api-routes",
+      "to": "llm-integration",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "llm-integration",
+      "to": "extended-thinking",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "extended-thinking",
+      "to": "trace-parsing",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "trace-parsing",
+      "to": "trace-alignment",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "tailwind-css",
+      "to": "css-glassmorphism",
+      "relationship": "prerequisite"
+    },
+    {
+      "from": "tailwind-css",
+      "to": "oklch-colors",
+      "relationship": "related"
+    },
+    {
+      "from": "zustand-store",
+      "to": "parallel-execution",
+      "relationship": "related"
+    },
+    {
+      "from": "css-glassmorphism",
+      "to": "framer-motion",
+      "relationship": "related"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "state-management",
+      "title": "Zustand over Redux for state management",
+      "chosen": "Zustand",
+      "alternatives": [
+        "Redux Toolkit",
+        "Jotai",
+        "React Context"
+      ],
+      "reasoning": "Zustand provides global state with minimal boilerplate. Redux Toolkit would add unnecessary complexity for this project's state needs. Zustand's hook-based API integrates naturally with React, and its selector pattern enables efficient re-renders when only specific trace data changes.",
+      "category": "state"
+    },
+    {
+      "id": "visualization-lib",
+      "title": "React Flow over D3 for trace visualization",
+      "chosen": "@xyflow/react (React Flow)",
+      "alternatives": [
+        "D3.js",
+        "vis.js",
+        "Cytoscape.js"
+      ],
+      "reasoning": "React Flow uses React components for nodes, making it seamless to integrate with the existing component architecture. D3 would require manual DOM manipulation that conflicts with React's virtual DOM. React Flow also provides built-in zoom, pan, minimap, and selection that would take weeks to implement with D3.",
+      "category": "visualization"
+    },
+    {
+      "id": "api-pattern",
+      "title": "Client-side API calls over server actions",
+      "chosen": "Client-side fetch to API routes",
+      "alternatives": [
+        "Next.js Server Actions",
+        "tRPC",
+        "GraphQL"
+      ],
+      "reasoning": "API routes provide clear separation between client and server, making it easier to handle streaming responses and timeout management for LLM calls. Server actions are designed for mutations and form submissions, not long-running inference requests that may take 30+ seconds.",
+      "category": "api"
+    },
+    {
+      "id": "color-system",
+      "title": "oklch over hex colors for design tokens",
+      "chosen": "oklch() color space",
+      "alternatives": [
+        "Hex colors",
+        "HSL",
+        "CSS custom properties with hex"
+      ],
+      "reasoning": "oklch provides perceptually uniform colors, meaning adjusting the hue doesn't accidentally change perceived brightness. This is critical for the trace visualization where different reasoning phases need distinct colors that all maintain readable contrast against the glassmorphism backgrounds.",
+      "category": "styling"
+    },
+    {
+      "id": "animation-lib",
+      "title": "Framer Motion over CSS animations",
+      "chosen": "Framer Motion",
+      "alternatives": [
+        "CSS animations/transitions",
+        "react-spring",
+        "GSAP"
+      ],
+      "reasoning": "Framer Motion's declarative API (initial, animate, exit) integrates cleanly with React's component model. CSS animations lack exit animations and orchestration. The AnimatePresence component handles mounting/unmounting transitions needed for panel switches, and spring physics create natural-feeling interactions.",
+      "category": "animation"
+    },
+    {
+      "id": "component-lib",
+      "title": "shadcn/ui over Material UI for base components",
+      "chosen": "shadcn/ui",
+      "alternatives": [
+        "Material UI",
+        "Chakra UI",
+        "Ant Design",
+        "Radix UI (unstyled)"
+      ],
+      "reasoning": "shadcn/ui copies components into your project as source code, giving full control over styling. Material UI imposes its own design language that would conflict with the glassmorphism aesthetic. shadcn/ui components are built on accessible Radix primitives and styled with Tailwind, matching the project's existing toolchain.",
+      "category": "styling"
+    }
+  ],
+  "learningPath": [
+    {
+      "id": "lesson-react-basics",
+      "order": 1,
+      "title": "What is React? Components, JSX, and Props",
+      "difficulty": "beginner",
+      "concepts": [
+        "react-components"
+      ],
+      "content": "React is a library for building user interfaces from reusable pieces called components. Each component is a function that returns JSX, a syntax that looks like HTML but lives inside JavaScript. Components accept inputs called props and can be nested to build complex UIs. In ThinkDiff, every visual element is a component: the prompt input, each trace panel, and even individual reasoning phase nodes in the tree visualization. Start by reading the React docs on 'Your First Component' and practice creating a simple component that accepts and displays props.",
+      "estimatedMinutes": 45
+    },
+    {
+      "id": "lesson-typescript",
+      "order": 2,
+      "title": "TypeScript Basics: Types, Interfaces, and Safety",
+      "difficulty": "beginner",
+      "concepts": [
+        "typescript-interfaces"
+      ],
+      "content": "TypeScript adds static types to JavaScript, catching bugs before your code runs. Interfaces define the shape of objects: what properties they have and what types those properties are. In ThinkDiff, interfaces like ParsedTrace and ReasoningPhase ensure that data maintains its structure as it flows from the LLM parser to the store to the UI. Learn to define interfaces, use union types for values that can be one of several types, and understand how TypeScript's compiler catches errors that would otherwise be runtime bugs.",
+      "estimatedMinutes": 60
+    },
+    {
+      "id": "lesson-state-management",
+      "order": 3,
+      "title": "State Management with Zustand",
+      "difficulty": "intermediate",
+      "concepts": [
+        "zustand-store",
+        "react-hooks"
+      ],
+      "content": "State management solves the problem of sharing data between components without passing props through every level. Zustand creates a global store as a React hook with zero boilerplate. You define state and actions in a single create() call, then use the hook in any component with optional selectors for performance. In ThinkDiff, the store holds all trace data, selected models, and UI state. Learn how Zustand compares to useState for local state, how selectors prevent unnecessary re-renders, and how middleware adds features like persistence.",
+      "estimatedMinutes": 40
+    },
+    {
+      "id": "lesson-nextjs-apis",
+      "order": 4,
+      "title": "Building APIs with Next.js Route Handlers",
+      "difficulty": "intermediate",
+      "concepts": [
+        "nextjs-routing",
+        "api-routes",
+        "server-components",
+        "client-components"
+      ],
+      "content": "Next.js App Router provides file-system based routing where folder structure maps to URL paths. Route handlers (route.ts files) create API endpoints by exporting functions for HTTP methods like GET and POST. Understanding the distinction between server components (default, no JavaScript sent to client) and client components ('use client' directive, interactive) is crucial. In ThinkDiff, the landing page is a server component for fast loading, while the comparison view is a client component for interactivity, and the /api/execute endpoint handles LLM calls on the server.",
+      "estimatedMinutes": 50
+    },
+    {
+      "id": "lesson-llm-apis",
+      "order": 5,
+      "title": "Working with LLM APIs: Claude, DeepSeek, and OpenAI",
+      "difficulty": "intermediate",
+      "concepts": [
+        "llm-integration",
+        "extended-thinking",
+        "parallel-execution"
+      ],
+      "content": "Integrating with LLM APIs involves initializing SDK clients, constructing request payloads, and handling responses. Each provider has its own SDK and conventions: Anthropic's SDK for Claude, OpenAI's SDK for both o3 and DeepSeek (which is OpenAI-compatible). Extended thinking features expose the model's reasoning chain. ThinkDiff uses Promise.all to call all three providers in parallel, reducing wait time. Learn how to configure API keys securely via environment variables, handle errors and timeouts, and normalize different response formats into a common interface.",
+      "estimatedMinutes": 55
+    },
+    {
+      "id": "lesson-react-flow",
+      "order": 6,
+      "title": "Data Visualization with React Flow",
+      "difficulty": "advanced",
+      "concepts": [
+        "react-flow"
+      ],
+      "content": "React Flow renders interactive node-based graphs using React components. You define nodes (with positions, types, and data) and edges (connections between nodes), and React Flow handles rendering, zoom, pan, and selection. Custom node types let you render any React content inside a node. In ThinkDiff, reasoning traces become tree graphs where each node represents a reasoning phase (hypothesis, analysis, conclusion) and edges show logical flow. Learn to define custom node types, compute tree layouts, style edges with gradients, and handle user interactions like click-to-expand.",
+      "estimatedMinutes": 60
+    },
+    {
+      "id": "lesson-animation",
+      "order": 7,
+      "title": "Animation with Framer Motion",
+      "difficulty": "intermediate",
+      "concepts": [
+        "framer-motion",
+        "css-glassmorphism",
+        "tailwind-css",
+        "oklch-colors"
+      ],
+      "content": "Framer Motion makes React animations declarative: replace div with motion.div and add initial, animate, and transition props. Spring physics create natural-feeling motion, and AnimatePresence handles exit animations when components unmount. Combined with glassmorphism styling (backdrop-blur + transparent backgrounds) and oklch colors, animations bring the UI to life. In ThinkDiff, panels slide in with spring transitions, metric counters animate from zero, and phase highlights pulse during the reasoning replay feature.",
+      "estimatedMinutes": 45
+    },
+    {
+      "id": "lesson-full-stack",
+      "order": 8,
+      "title": "Building a Full-Stack AI Application",
+      "difficulty": "advanced",
+      "concepts": [
+        "trace-parsing",
+        "trace-alignment",
+        "zustand-store",
+        "react-flow",
+        "parallel-execution"
+      ],
+      "content": "Bringing it all together: a full-stack AI application that spans from API integration to data processing to interactive visualization. ThinkDiff's architecture follows a clear data flow: user enters a prompt, the API layer calls multiple LLMs in parallel, the parser transforms raw traces into structured phases, the alignment algorithm matches phases across models, and the visualization layer renders everything as interactive trees and comparison views. Learn how to design data pipelines that transform unstructured AI output into structured, visualizable data, and how to architect a React application that keeps complex state manageable.",
+      "estimatedMinutes": 75
+    }
+  ]
+}
