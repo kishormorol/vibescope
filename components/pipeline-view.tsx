@@ -12,6 +12,8 @@ import {
 import "@xyflow/react/dist/style.css";
 import { motion } from "framer-motion";
 import { useEffect, useMemo } from "react";
+import { useTheme } from "next-themes";
+import { themeColors } from "@/lib/theme-colors";
 import { useStore } from "@/lib/store";
 import type { PipelineStage } from "@/lib/types";
 
@@ -31,6 +33,9 @@ interface PipelineNodeData {
 
 function PipelineNode({ data }: { data: PipelineNodeData }) {
   const { stage, hue, index } = data;
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
 
   return (
     <motion.div
@@ -39,14 +44,14 @@ function PipelineNode({ data }: { data: PipelineNodeData }) {
       transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
       className="glass rounded-2xl p-4 w-[240px] group cursor-default"
       style={{
-        borderColor: `oklch(0.55 0.12 ${hue} / 30%)`,
+        borderColor: tc.hueBorder(hue, 0.3),
         borderWidth: 1,
         borderStyle: "solid",
-        background: `linear-gradient(135deg, oklch(0.15 0.03 ${hue} / 70%), oklch(0.1 0.01 ${hue} / 50%))`,
+        background: `linear-gradient(135deg, ${tc.hueBg(hue, 0.7)}, ${tc.hueBg(hue, 0.5)})`,
         transition: "box-shadow 0.3s ease",
       }}
       whileHover={{
-        boxShadow: `0 0 30px oklch(0.6 0.15 ${hue} / 25%), 0 0 60px oklch(0.5 0.1 ${hue} / 10%)`,
+        boxShadow: tc.shadowActive(hue),
       }}
     >
       {/* Target handle (left) */}
@@ -55,8 +60,8 @@ function PipelineNode({ data }: { data: PipelineNodeData }) {
         position={Position.Left}
         className="!w-2.5 !h-2.5 !border-2 !rounded-full"
         style={{
-          background: `oklch(0.6 0.15 ${hue})`,
-          borderColor: `oklch(0.3 0.05 ${hue})`,
+          background: tc.hueText(hue),
+          borderColor: tc.hueBorder(hue),
         }}
       />
 
@@ -66,7 +71,7 @@ function PipelineNode({ data }: { data: PipelineNodeData }) {
       {/* Label */}
       <div
         className="font-bold text-base mb-1"
-        style={{ color: `oklch(0.85 0.1 ${hue})` }}
+        style={{ color: tc.hueText(hue) }}
       >
         {stage.label}
       </div>
@@ -74,7 +79,7 @@ function PipelineNode({ data }: { data: PipelineNodeData }) {
       {/* Description */}
       <p
         className="text-xs leading-relaxed mb-3 font-mono"
-        style={{ color: `oklch(0.6 0.03 ${hue})` }}
+        style={{ color: tc.muted }}
       >
         {stage.description}
       </p>
@@ -87,9 +92,9 @@ function PipelineNode({ data }: { data: PipelineNodeData }) {
               key={tech}
               className="px-2 py-0.5 rounded-md text-xs font-mono"
               style={{
-                background: `oklch(0.25 0.06 ${hue} / 60%)`,
-                color: `oklch(0.75 0.1 ${hue})`,
-                border: `1px solid oklch(0.4 0.08 ${hue} / 30%)`,
+                background: tc.accentBg(hue),
+                color: tc.hueBadgeText(hue),
+                border: `1px solid ${tc.hueBorder(hue, 0.3)}`,
               }}
             >
               {tech}
@@ -101,7 +106,7 @@ function PipelineNode({ data }: { data: PipelineNodeData }) {
       {/* Files count badge */}
       <div
         className="text-xs font-mono mt-1"
-        style={{ color: `oklch(0.5 0.04 ${hue})` }}
+        style={{ color: tc.muted }}
       >
         {stage.filesInvolved.length} file
         {stage.filesInvolved.length !== 1 ? "s" : ""} involved
@@ -113,8 +118,8 @@ function PipelineNode({ data }: { data: PipelineNodeData }) {
         position={Position.Right}
         className="!w-2.5 !h-2.5 !border-2 !rounded-full"
         style={{
-          background: `oklch(0.6 0.15 ${hue})`,
-          borderColor: `oklch(0.3 0.05 ${hue})`,
+          background: tc.hueText(hue),
+          borderColor: tc.hueBorder(hue),
         }}
       />
     </motion.div>
@@ -125,6 +130,9 @@ const nodeTypes = { pipeline: PipelineNode };
 
 // ─── Main Component ─────────────────────────
 export function PipelineView() {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
   const analysis = useStore((s) => s.analysis);
   const pipeline = analysis?.pipeline;
 
@@ -155,7 +163,7 @@ export function PipelineView() {
         target: nextStage.id,
         animated: true,
         style: {
-          stroke: `oklch(0.5 0.12 ${hue})`,
+          stroke: tc.hueText(hue),
           strokeWidth: 2,
           strokeDasharray: "6 4",
         },
@@ -164,7 +172,7 @@ export function PipelineView() {
     });
 
     return { initialNodes: nodes, initialEdges: edges };
-  }, [pipeline]);
+  }, [pipeline, isDark]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -183,13 +191,13 @@ export function PipelineView() {
           <div className="text-3xl mb-3">⊞</div>
           <p
             className="text-sm font-mono"
-            style={{ color: "oklch(0.5 0.02 260)" }}
+            style={{ color: tc.muted }}
           >
             No pipeline data available.
           </p>
           <p
             className="text-xs font-mono mt-1"
-            style={{ color: "oklch(0.4 0.01 260)" }}
+            style={{ color: tc.subtle }}
           >
             Analyze a codebase to see its build journey.
           </p>
@@ -208,12 +216,16 @@ export function PipelineView() {
         nodeTypes={nodeTypes}
         fitView
         proOptions={{ hideAttribution: true }}
-        style={{ background: "oklch(0.08 0.01 260)" }}
+        style={{ background: tc.panelBg }}
       >
         <Controls
-          className="!bg-white/5 !border-white/10 !rounded-lg [&_button]:!bg-white/5 [&_button]:!border-white/10 [&_button]:!fill-white/50 [&_button:hover]:!bg-white/10"
+          className="!rounded-lg"
+          style={{
+            background: tc.white(0.05),
+            border: `1px solid ${tc.borderWhite}`,
+          }}
         />
-        <Background color="oklch(0.2 0.02 260)" gap={24} size={1} />
+        <Background color={tc.divider} gap={24} size={1} />
       </ReactFlow>
     </div>
   );

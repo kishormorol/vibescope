@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
 import { useStore } from "@/lib/store";
+import { themeColors } from "@/lib/theme-colors";
 import type { Decision, TechCategory } from "@/lib/types";
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -34,9 +36,11 @@ const cardVariants = {
 function DecisionCard({
   decision,
   index,
+  tc,
 }: {
   decision: Decision;
   index: number;
+  tc: ReturnType<typeof themeColors>;
 }) {
   const hue = getCategoryHue(decision.category);
 
@@ -46,27 +50,31 @@ function DecisionCard({
       variants={cardVariants}
       initial="hidden"
       animate="visible"
-      className="rounded-xl p-5 border border-white/10 space-y-3"
+      className="rounded-xl p-5 space-y-3"
       style={{
-        background: "oklch(0.12 0.01 260 / 60%)",
-        backdropFilter: "blur(12px)",
-        boxShadow: `0 0 24px oklch(0.4 0.08 ${hue} / 8%), inset 0 1px 0 oklch(1 0 0 / 4%)`,
+        background: tc.cardBg,
+        backdropFilter: tc.backdrop,
+        border: `1px solid ${tc.borderWhite}`,
+        boxShadow: tc.shadow(hue, 0.08),
       }}
     >
       {/* Title */}
-      <h3 className="text-base font-semibold text-foreground">
+      <h3
+        className="text-base font-semibold"
+        style={{ color: tc.heading }}
+      >
         {decision.title}
       </h3>
 
       {/* Chosen */}
       <div className="flex items-center gap-2">
-        <span className="text-xs text-muted-foreground shrink-0">Chosen:</span>
+        <span className="text-xs shrink-0" style={{ color: tc.muted }}>Chosen:</span>
         <span
           className="text-sm font-semibold px-2.5 py-0.5 rounded-lg"
           style={{
-            color: `oklch(0.9 0.1 ${hue})`,
-            background: `oklch(0.2 0.04 ${hue} / 50%)`,
-            boxShadow: `0 0 12px oklch(0.6 0.12 ${hue} / 25%)`,
+            color: tc.accentText(hue),
+            background: tc.hueBadgeBg(hue),
+            boxShadow: tc.hueGlow(hue, 0.25),
           }}
         >
           {decision.chosen}
@@ -76,10 +84,10 @@ function DecisionCard({
       {/* Alternatives */}
       {decision.alternatives.length > 0 && (
         <div className="flex items-start gap-2">
-          <span className="text-xs text-muted-foreground shrink-0 mt-0.5">
+          <span className="text-xs shrink-0 mt-0.5" style={{ color: tc.muted }}>
             Alternatives:
           </span>
-          <span className="text-xs text-muted-foreground/60">
+          <span className="text-xs" style={{ color: tc.subtle }}>
             {decision.alternatives.join(", ")}
           </span>
         </div>
@@ -87,10 +95,10 @@ function DecisionCard({
 
       {/* Reasoning */}
       <div className="space-y-1">
-        <span className="text-xs text-muted-foreground font-medium">
+        <span className="text-xs font-medium" style={{ color: tc.muted }}>
           Reasoning
         </span>
-        <p className="text-xs text-foreground/70 leading-relaxed">
+        <p className="text-xs leading-relaxed" style={{ color: tc.body }}>
           {decision.reasoning}
         </p>
       </div>
@@ -100,8 +108,8 @@ function DecisionCard({
         <span
           className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
           style={{
-            background: `oklch(0.2 0.04 ${hue} / 50%)`,
-            color: `oklch(0.75 0.1 ${hue})`,
+            background: tc.hueBadgeBg(hue),
+            color: tc.hueText(hue),
           }}
         >
           {decision.category}
@@ -113,12 +121,15 @@ function DecisionCard({
 
 export function DecisionLog() {
   const { analysis } = useStore();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
   const decisions = analysis?.decisions ?? [];
 
   if (!analysis) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm" style={{ color: tc.muted }}>
           No analysis yet. Analyze a repository to view architecture decisions.
         </p>
       </div>
@@ -128,7 +139,7 @@ export function DecisionLog() {
   if (decisions.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm" style={{ color: tc.muted }}>
           No decisions found in the analysis.
         </p>
       </div>
@@ -140,14 +151,14 @@ export function DecisionLog() {
       <div className="flex items-center gap-2 mb-2">
         <h2
           className="text-sm font-semibold uppercase tracking-wider"
-          style={{ color: "oklch(0.7 0.1 80)" }}
+          style={{ color: tc.hueText(80) }}
         >
           Architecture Decisions ({decisions.length})
         </h2>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         {decisions.map((decision, i) => (
-          <DecisionCard key={decision.id} decision={decision} index={i} />
+          <DecisionCard key={decision.id} decision={decision} index={i} tc={tc} />
         ))}
       </div>
     </div>

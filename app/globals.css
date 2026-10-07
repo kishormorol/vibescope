@@ -49,10 +49,60 @@
 }
 
 /* ═══════════════════════════════════════════════
-   DARK-FIRST AI AESTHETIC
+   THEME TOKENS
    ═══════════════════════════════════════════════ */
 
 :root {
+  --radius: 0.75rem;
+}
+
+/* ── Light mode ── */
+:root:not(.dark) {
+  --background: oklch(0.97 0.005 260);
+  --foreground: oklch(0.15 0.02 260);
+  --card: oklch(0.99 0.003 260);
+  --card-foreground: oklch(0.15 0.02 260);
+  --popover: oklch(0.99 0.003 260);
+  --popover-foreground: oklch(0.15 0.02 260);
+  --primary: oklch(0.5 0.2 260);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.93 0.01 260);
+  --secondary-foreground: oklch(0.25 0.03 260);
+  --muted: oklch(0.94 0.005 260);
+  --muted-foreground: oklch(0.45 0.03 260);
+  --accent: oklch(0.93 0.015 260);
+  --accent-foreground: oklch(0.2 0.03 260);
+  --destructive: oklch(0.55 0.22 25);
+  --border: oklch(0.88 0.01 260);
+  --input: oklch(0.93 0.01 260);
+  --ring: oklch(0.5 0.2 260);
+  --chart-1: oklch(0.55 0.2 260);
+  --chart-2: oklch(0.55 0.18 180);
+  --chart-3: oklch(0.55 0.18 140);
+  --chart-4: oklch(0.6 0.15 40);
+  --chart-5: oklch(0.55 0.18 320);
+  --sidebar: oklch(0.96 0.005 260);
+  --sidebar-foreground: oklch(0.15 0.02 260);
+  --sidebar-primary: oklch(0.5 0.2 260);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.93 0.01 260);
+  --sidebar-accent-foreground: oklch(0.2 0.03 260);
+  --sidebar-border: oklch(0.88 0.01 260);
+  --sidebar-ring: oklch(0.5 0.2 260);
+
+  /* VibeScope custom tokens — light */
+  --glow-primary: oklch(0.5 0.2 260);
+  --glow-cyan: oklch(0.55 0.15 195);
+  --glow-emerald: oklch(0.5 0.17 155);
+  --glow-amber: oklch(0.6 0.16 80);
+  --glow-red: oklch(0.55 0.22 25);
+  --glow-violet: oklch(0.5 0.22 300);
+  --glass-bg: oklch(0.99 0.003 260 / 70%);
+  --glass-border: oklch(0.85 0.01 260 / 60%);
+}
+
+/* ── Dark mode ── */
+.dark {
   --background: oklch(0.08 0.01 260);
   --foreground: oklch(0.93 0.01 260);
   --card: oklch(0.12 0.015 260);
@@ -76,7 +126,6 @@
   --chart-3: oklch(0.7 0.18 140);
   --chart-4: oklch(0.7 0.15 40);
   --chart-5: oklch(0.7 0.18 320);
-  --radius: 0.75rem;
   --sidebar: oklch(0.1 0.01 260);
   --sidebar-foreground: oklch(0.93 0.01 260);
   --sidebar-primary: oklch(0.7 0.18 260);
@@ -86,7 +135,7 @@
   --sidebar-border: oklch(0.2 0.02 260);
   --sidebar-ring: oklch(0.6 0.18 260);
 
-  /* VibeScope custom tokens */
+  /* VibeScope custom tokens — dark */
   --glow-primary: oklch(0.7 0.25 260);
   --glow-cyan: oklch(0.75 0.15 195);
   --glow-emerald: oklch(0.72 0.17 155);
@@ -103,10 +152,18 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-attachment: fixed;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  .dark body {
     background-image:
       radial-gradient(ellipse 80% 50% at 50% -20%, oklch(0.25 0.1 260 / 30%), transparent),
       radial-gradient(ellipse 60% 40% at 80% 80%, oklch(0.2 0.08 195 / 15%), transparent);
-    background-attachment: fixed;
+  }
+  :root:not(.dark) body {
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, oklch(0.9 0.04 260 / 20%), transparent),
+      radial-gradient(ellipse 60% 40% at 80% 80%, oklch(0.92 0.03 195 / 15%), transparent);
   }
   html {
     @apply font-sans;
@@ -124,65 +181,93 @@
   -webkit-backdrop-filter: blur(16px) saturate(1.5);
 }
 
-.glass-strong {
+.dark .glass-strong {
   background: oklch(0.12 0.02 260 / 80%);
   border: 1px solid oklch(0.3 0.04 260 / 50%);
   backdrop-filter: blur(24px) saturate(1.8);
   -webkit-backdrop-filter: blur(24px) saturate(1.8);
 }
 
+:root:not(.dark) .glass-strong {
+  background: oklch(0.99 0.003 260 / 85%);
+  border: 1px solid oklch(0.85 0.01 260 / 60%);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  box-shadow: 0 2px 12px oklch(0.5 0.05 260 / 8%);
+}
+
 /* ═══════════════════════════════════════════════
    GLOW EFFECTS
    ═══════════════════════════════════════════════ */
 
-.glow-primary {
+/* Dark glow effects */
+.dark .glow-primary {
   box-shadow:
     0 0 20px oklch(0.7 0.25 260 / 20%),
     0 0 60px oklch(0.7 0.25 260 / 8%),
     inset 0 0 20px oklch(0.7 0.25 260 / 5%);
 }
-
-.glow-cyan {
+.dark .glow-cyan {
   box-shadow:
     0 0 20px oklch(0.75 0.15 195 / 25%),
     0 0 60px oklch(0.75 0.15 195 / 10%),
     inset 0 0 20px oklch(0.75 0.15 195 / 5%);
 }
-
-.glow-emerald {
+.dark .glow-emerald {
   box-shadow:
     0 0 20px oklch(0.72 0.17 155 / 25%),
     0 0 60px oklch(0.72 0.17 155 / 10%),
     inset 0 0 20px oklch(0.72 0.17 155 / 5%);
 }
-
-.glow-amber {
+.dark .glow-amber {
   box-shadow:
     0 0 20px oklch(0.78 0.16 80 / 25%),
     0 0 60px oklch(0.78 0.16 80 / 10%),
     inset 0 0 20px oklch(0.78 0.16 80 / 5%);
 }
-
-.glow-red {
+.dark .glow-red {
   box-shadow:
     0 0 20px oklch(0.65 0.22 25 / 25%),
     0 0 60px oklch(0.65 0.22 25 / 10%),
     inset 0 0 20px oklch(0.65 0.22 25 / 5%);
 }
-
-.glow-violet {
+.dark .glow-violet {
   box-shadow:
     0 0 20px oklch(0.65 0.22 300 / 25%),
     0 0 60px oklch(0.65 0.22 300 / 10%),
     inset 0 0 20px oklch(0.65 0.22 300 / 5%);
 }
-
-.glow-text-primary {
+.dark .glow-text-primary {
   text-shadow: 0 0 20px oklch(0.7 0.25 260 / 50%), 0 0 40px oklch(0.7 0.25 260 / 20%);
 }
-
-.glow-text-cyan {
+.dark .glow-text-cyan {
   text-shadow: 0 0 20px oklch(0.75 0.15 195 / 50%), 0 0 40px oklch(0.75 0.15 195 / 20%);
+}
+
+/* Light glow effects — subtle shadows instead */
+:root:not(.dark) .glow-primary {
+  box-shadow: 0 2px 12px oklch(0.5 0.15 260 / 12%), 0 0 0 1px oklch(0.85 0.03 260 / 30%);
+}
+:root:not(.dark) .glow-cyan {
+  box-shadow: 0 2px 12px oklch(0.5 0.1 195 / 12%), 0 0 0 1px oklch(0.85 0.03 195 / 30%);
+}
+:root:not(.dark) .glow-emerald {
+  box-shadow: 0 2px 12px oklch(0.5 0.1 155 / 12%), 0 0 0 1px oklch(0.85 0.03 155 / 30%);
+}
+:root:not(.dark) .glow-amber {
+  box-shadow: 0 2px 12px oklch(0.55 0.1 80 / 12%), 0 0 0 1px oklch(0.88 0.03 80 / 30%);
+}
+:root:not(.dark) .glow-red {
+  box-shadow: 0 2px 12px oklch(0.5 0.12 25 / 12%), 0 0 0 1px oklch(0.85 0.05 25 / 30%);
+}
+:root:not(.dark) .glow-violet {
+  box-shadow: 0 2px 12px oklch(0.5 0.12 300 / 12%), 0 0 0 1px oklch(0.85 0.05 300 / 30%);
+}
+:root:not(.dark) .glow-text-primary {
+  text-shadow: none;
+}
+:root:not(.dark) .glow-text-cyan {
+  text-shadow: none;
 }
 
 /* ═══════════════════════════════════════════════
@@ -210,11 +295,17 @@
    ANIMATED GRID BACKGROUND
    ═══════════════════════════════════════════════ */
 
-.grid-bg {
+.dark .grid-bg {
   background-size: 40px 40px;
   background-image:
     linear-gradient(to right, oklch(0.2 0.02 260 / 30%) 1px, transparent 1px),
     linear-gradient(to bottom, oklch(0.2 0.02 260 / 30%) 1px, transparent 1px);
+}
+:root:not(.dark) .grid-bg {
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, oklch(0.8 0.01 260 / 25%) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0.8 0.01 260 / 25%) 1px, transparent 1px);
 }
 
 /* ═══════════════════════════════════════════════
@@ -321,25 +412,42 @@
   background: transparent !important;
 }
 
-.react-flow__controls {
+.dark .react-flow__controls {
   background: oklch(0.14 0.02 260 / 80%) !important;
   border: 1px solid oklch(0.3 0.03 260 / 40%) !important;
   border-radius: 12px !important;
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px oklch(0 0 0 / 30%) !important;
 }
-
-.react-flow__controls button {
+.dark .react-flow__controls button {
   background: transparent !important;
   border-bottom: 1px solid oklch(0.25 0.02 260 / 40%) !important;
   color: oklch(0.7 0.02 260) !important;
   fill: oklch(0.7 0.02 260) !important;
 }
-
-.react-flow__controls button:hover {
+.dark .react-flow__controls button:hover {
   background: oklch(0.2 0.03 260 / 60%) !important;
   color: oklch(0.9 0.02 260) !important;
   fill: oklch(0.9 0.02 260) !important;
+}
+
+:root:not(.dark) .react-flow__controls {
+  background: oklch(0.99 0.003 260 / 90%) !important;
+  border: 1px solid oklch(0.85 0.01 260 / 50%) !important;
+  border-radius: 12px !important;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 10px oklch(0.5 0.03 260 / 10%) !important;
+}
+:root:not(.dark) .react-flow__controls button {
+  background: transparent !important;
+  border-bottom: 1px solid oklch(0.88 0.01 260 / 50%) !important;
+  color: oklch(0.35 0.03 260) !important;
+  fill: oklch(0.35 0.03 260) !important;
+}
+:root:not(.dark) .react-flow__controls button:hover {
+  background: oklch(0.93 0.01 260 / 60%) !important;
+  color: oklch(0.2 0.03 260) !important;
+  fill: oklch(0.2 0.03 260) !important;
 }
 
 .react-flow__attribution {
@@ -356,13 +464,21 @@
   background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
+.dark ::-webkit-scrollbar-thumb,
+.dark::-webkit-scrollbar-thumb {
   background: oklch(0.3 0.03 260 / 50%);
   border-radius: 3px;
 }
-
-::-webkit-scrollbar-thumb:hover {
+.dark ::-webkit-scrollbar-thumb:hover,
+.dark::-webkit-scrollbar-thumb:hover {
   background: oklch(0.4 0.04 260 / 60%);
+}
+:root:not(.dark) ::-webkit-scrollbar-thumb {
+  background: oklch(0.7 0.02 260 / 40%);
+  border-radius: 3px;
+}
+:root:not(.dark) ::-webkit-scrollbar-thumb:hover {
+  background: oklch(0.6 0.03 260 / 50%);
 }
 
 /* ═══════════════════════════════════════════════
@@ -384,8 +500,13 @@
   width: 2.5rem;
   margin-right: 1rem;
   text-align: right;
-  color: oklch(0.35 0.02 260);
   font-size: 0.7rem;
+}
+.dark .shiki code > .line::before {
+  color: oklch(0.35 0.02 260);
+}
+:root:not(.dark) .shiki code > .line::before {
+  color: oklch(0.65 0.02 260);
 }
 
 /* Code annotation highlight */

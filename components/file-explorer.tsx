@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/lib/store";
+import { useTheme } from "next-themes";
+import { themeColors } from "@/lib/theme-colors";
 import type { AnalyzedFile, Difficulty } from "@/lib/types";
 import { FileAnatomy } from "./file-anatomy";
 
@@ -77,6 +79,10 @@ function TreeItem({
   selectedFile: string | null;
   onSelect: (path: string) => void;
 }) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
+
   const [expanded, setExpanded] = useState(depth < 2);
   const diff = node.file?.difficulty;
   const diffColor = diff ? DIFFICULTY_COLORS[diff] : null;
@@ -132,10 +138,10 @@ function TreeItem({
       style={{
         paddingLeft: `${depth * 12 + 8}px`,
         background: isSelected
-          ? `oklch(0.2 0.04 ${diffColor?.hue ?? "155"} / 50%)`
+          ? tc.hueBg(diffColor?.hue ?? "155", 0.5)
           : undefined,
         color: isSelected
-          ? `oklch(0.85 0.12 ${diffColor?.hue ?? "155"})`
+          ? tc.hueText(diffColor?.hue ?? "155")
           : undefined,
       }}
     >
@@ -143,8 +149,8 @@ function TreeItem({
         className="w-1.5 h-1.5 rounded-full shrink-0"
         style={{
           background: diffColor
-            ? `oklch(0.7 0.15 ${diffColor.hue})`
-            : "oklch(0.5 0 0)",
+            ? tc.hueText(diffColor.hue)
+            : tc.muted,
         }}
       />
       <span className="truncate">{node.name}</span>
@@ -158,14 +164,18 @@ function TreeItem({
 }
 
 function DifficultyBadge({ difficulty }: { difficulty: Difficulty }) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
+
   const { hue, label } = DIFFICULTY_COLORS[difficulty];
   return (
     <span
       className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
       style={{
-        background: `oklch(0.2 0.04 ${hue} / 60%)`,
-        color: `oklch(0.8 0.12 ${hue})`,
-        boxShadow: `0 0 8px oklch(0.6 0.12 ${hue} / 20%)`,
+        background: tc.hueBadgeBg(hue),
+        color: tc.hueBadgeText(hue),
+        boxShadow: tc.hueGlow(hue, 0.2),
       }}
     >
       {label}
@@ -174,14 +184,30 @@ function DifficultyBadge({ difficulty }: { difficulty: Difficulty }) {
 }
 
 function CategoryBadge({ category }: { category: string }) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
+
   return (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-white/5 text-muted-foreground border border-white/10">
+    <span
+      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium text-muted-foreground"
+      style={{
+        background: tc.white(0.05),
+        borderWidth: 1,
+        borderStyle: "solid",
+        borderColor: tc.white(0.1),
+      }}
+    >
       {category}
     </span>
   );
 }
 
 export function FileExplorer() {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
+
   const { analysis, selectedFile, setSelectedFile, setSelectedConcept } =
     useStore();
 
@@ -214,10 +240,10 @@ export function FileExplorer() {
     <div className="grid grid-cols-[280px_1fr] gap-4 h-[600px]">
       {/* Left sidebar: file tree */}
       <div className="glass rounded-xl overflow-hidden flex flex-col">
-        <div className="px-3 py-2.5 border-b border-white/5">
+        <div className="px-3 py-2.5" style={{ borderBottom: `1px solid ${tc.white(0.05)}` }}>
           <h3
             className="text-xs font-semibold tracking-wider uppercase"
-            style={{ color: "oklch(0.7 0.1 155)" }}
+            style={{ color: tc.hueText("155") }}
           >
             Files ({files.length})
           </h3>
@@ -248,12 +274,20 @@ export function FileExplorer() {
               className="flex flex-col h-full overflow-hidden"
             >
               {/* Header */}
-              <div className="space-y-2 px-5 pt-5 pb-3 border-b border-white/5 shrink-0">
+              <div className="space-y-2 px-5 pt-5 pb-3 shrink-0" style={{ borderBottom: `1px solid ${tc.white(0.05)}` }}>
                 <h2 className="text-lg font-semibold text-foreground font-mono">
                   {selected.path}
                 </h2>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs px-2 py-0.5 rounded bg-white/5 text-muted-foreground border border-white/10">
+                  <span
+                    className="text-xs px-2 py-0.5 rounded text-muted-foreground"
+                    style={{
+                      background: tc.white(0.05),
+                      borderWidth: 1,
+                      borderStyle: "solid",
+                      borderColor: tc.white(0.1),
+                    }}
+                  >
                     {selected.language}
                   </span>
                   <span className="text-xs text-muted-foreground">

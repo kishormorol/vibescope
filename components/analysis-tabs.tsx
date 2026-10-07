@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
 import { useStore } from "@/lib/store";
+import { themeColors } from "@/lib/theme-colors";
 import type { AnalysisTab } from "@/lib/types";
 
 const TABS: { id: AnalysisTab; icon: string; label: string; color: string }[] =
@@ -16,6 +18,9 @@ const TABS: { id: AnalysisTab; icon: string; label: string; color: string }[] =
 
 export function AnalysisTabs() {
   const { activeTab, setActiveTab } = useStore();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
 
   return (
     <div className="flex justify-center">
@@ -31,8 +36,8 @@ export function AnalysisTabs() {
                 layoutId="active-tab"
                 className="absolute inset-0 rounded-lg"
                 style={{
-                  background: `oklch(0.2 0.05 ${tab.color} / 60%)`,
-                  boxShadow: `0 0 20px oklch(0.7 0.15 ${tab.color} / 15%)`,
+                  background: tc.accentBg(tab.color),
+                  boxShadow: tc.hueGlow(tab.color),
                 }}
                 transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
               />
@@ -42,7 +47,7 @@ export function AnalysisTabs() {
               style={{
                 color:
                   activeTab === tab.id
-                    ? `oklch(0.8 0.12 ${tab.color})`
+                    ? tc.accentText(tab.color)
                     : undefined,
               }}
             >

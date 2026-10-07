@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
 import { useStore } from "@/lib/store";
+import { themeColors } from "@/lib/theme-colors";
 import { cacheAnalysis, clearCache } from "@/lib/cache";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
@@ -50,6 +52,9 @@ function TypingSubtitle() {
 export default function HomePage() {
   const { repoUrl, setRepoUrl, setApiKey, setAnalysis, cachedRepos, loadCachedRepos, loadFromCache } = useStore();
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [tempApiKey, setTempApiKey] = useState("");
 
@@ -94,7 +99,10 @@ export default function HomePage() {
         className="text-center space-y-8 max-w-3xl relative"
       >
         {/* Animated gradient background for hero */}
-        <div className="absolute -inset-20 -z-10 rounded-3xl opacity-40 animate-gradient-shift" style={{ background: 'linear-gradient(135deg, oklch(0.2 0.08 260 / 30%), oklch(0.15 0.06 195 / 20%), oklch(0.2 0.08 300 / 25%), oklch(0.15 0.06 155 / 20%))', backgroundSize: '200% 200%', filter: 'blur(60px)' }} />
+        <div className="absolute -inset-20 -z-10 rounded-3xl opacity-40 animate-gradient-shift" style={{ background: isDark
+          ? 'linear-gradient(135deg, oklch(0.2 0.08 260 / 30%), oklch(0.15 0.06 195 / 20%), oklch(0.2 0.08 300 / 25%), oklch(0.15 0.06 155 / 20%))'
+          : 'linear-gradient(135deg, oklch(0.85 0.06 260 / 25%), oklch(0.88 0.04 195 / 20%), oklch(0.85 0.06 300 / 20%), oklch(0.88 0.04 155 / 15%))',
+          backgroundSize: '200% 200%', filter: 'blur(60px)' }} />
 
         {/* Badge */}
         <motion.div
@@ -110,7 +118,9 @@ export default function HomePage() {
 
         {/* Title */}
         <h1 className="text-7xl sm:text-8xl font-bold tracking-tighter">
-          <span className="bg-gradient-to-r from-[oklch(0.75_0.18_260)] via-[oklch(0.8_0.15_195)] to-[oklch(0.72_0.17_155)] bg-clip-text text-transparent">
+          <span className={`bg-gradient-to-r bg-clip-text text-transparent ${isDark
+            ? "from-[oklch(0.75_0.18_260)] via-[oklch(0.8_0.15_195)] to-[oklch(0.72_0.17_155)]"
+            : "from-[oklch(0.45_0.22_260)] via-[oklch(0.5_0.18_195)] to-[oklch(0.42_0.2_155)]"}`}>
             Vibe
           </span>
           <span className="text-foreground/30">Scope</span>
@@ -195,7 +205,7 @@ export default function HomePage() {
               key={f.label}
               className="px-4 py-2 rounded-lg text-sm font-mono glass border-[oklch(0.25_0.03_260_/_30%)] text-muted-foreground/70"
             >
-              <span style={{ color: `oklch(0.7 0.15 ${f.color})` }}>
+              <span style={{ color: isDark ? `oklch(0.7 0.15 ${f.color})` : `oklch(0.45 0.18 ${f.color})` }}>
                 {f.icon}
               </span>{" "}
               {f.label}

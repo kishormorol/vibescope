@@ -2,7 +2,9 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "next-themes";
 import { useStore } from "@/lib/store";
+import { themeColors } from "@/lib/theme-colors";
 import type { Lesson, Difficulty, LessonResource } from "@/lib/types";
 
 const DIFFICULTY_COLORS: Record<Difficulty, { hue: string; label: string }> = {
@@ -25,9 +27,11 @@ const cardVariants = {
 function ProgressRing({
   completed,
   total,
+  isDark,
 }: {
   completed: number;
   total: number;
+  isDark: boolean;
 }) {
   const pct = total > 0 ? completed / total : 0;
   const radius = 36;
@@ -37,22 +41,20 @@ function ProgressRing({
   return (
     <div className="relative w-24 h-24 shrink-0">
       <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90">
-        {/* Background ring */}
         <circle
           cx="40"
           cy="40"
           r={radius}
           fill="none"
-          stroke="oklch(0.2 0.02 155 / 40%)"
+          stroke={isDark ? "oklch(0.2 0.02 155 / 40%)" : "oklch(0.88 0.02 155 / 50%)"}
           strokeWidth="5"
         />
-        {/* Progress ring */}
         <motion.circle
           cx="40"
           cy="40"
           r={radius}
           fill="none"
-          stroke="oklch(0.65 0.15 155)"
+          stroke={isDark ? "oklch(0.65 0.15 155)" : "oklch(0.45 0.18 155)"}
           strokeWidth="5"
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -60,7 +62,9 @@ function ProgressRing({
           animate={{ strokeDashoffset: offset }}
           transition={{ duration: 0.8, ease: "easeOut" }}
           style={{
-            filter: "drop-shadow(0 0 6px oklch(0.6 0.15 155 / 50%))",
+            filter: isDark
+              ? "drop-shadow(0 0 6px oklch(0.6 0.15 155 / 50%))"
+              : "drop-shadow(0 0 4px oklch(0.45 0.15 155 / 30%))",
           }}
         />
       </svg>
@@ -70,7 +74,7 @@ function ProgressRing({
           initial={{ scale: 1.3, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="text-lg font-bold"
-          style={{ color: "oklch(0.9 0.08 155)" }}
+          style={{ color: isDark ? "oklch(0.9 0.08 155)" : "oklch(0.35 0.12 155)" }}
         >
           {Math.round(pct * 100)}%
         </motion.span>
@@ -87,6 +91,7 @@ function LessonCard({
   index,
   isCompleted,
   isActive,
+  isDark,
   onToggleComplete,
   onActivate,
   onConceptClick,
@@ -95,11 +100,13 @@ function LessonCard({
   index: number;
   isCompleted: boolean;
   isActive: boolean;
+  isDark: boolean;
   onToggleComplete: (id: string) => void;
   onActivate: (id: string) => void;
   onConceptClick: (concept: string) => void;
 }) {
   const { hue, label } = DIFFICULTY_COLORS[lesson.difficulty];
+  const tc = themeColors(isDark);
 
   return (
     <motion.div
@@ -111,7 +118,6 @@ function LessonCard({
     >
       {/* Timeline connector */}
       <div className="flex flex-col items-center shrink-0">
-        {/* Order circle — clickable to mark complete */}
         <motion.button
           whileHover={{ scale: 1.15 }}
           whileTap={{ scale: 0.9 }}
@@ -119,31 +125,32 @@ function LessonCard({
           className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 relative z-10 transition-all duration-300 cursor-pointer"
           style={{
             background: isCompleted
-              ? `oklch(0.35 0.12 155)`
-              : `oklch(0.15 0.03 ${hue})`,
+              ? (isDark ? `oklch(0.35 0.12 155)` : `oklch(0.88 0.06 155)`)
+              : tc.hueBg(hue),
             borderColor: isCompleted
-              ? `oklch(0.6 0.15 155)`
-              : `oklch(0.55 0.12 ${hue})`,
+              ? (isDark ? `oklch(0.6 0.15 155)` : `oklch(0.5 0.15 155)`)
+              : tc.hueBorder(hue),
             color: isCompleted
-              ? `oklch(0.95 0.05 155)`
-              : `oklch(0.85 0.1 ${hue})`,
+              ? (isDark ? `oklch(0.95 0.05 155)` : `oklch(0.3 0.1 155)`)
+              : tc.hueText(hue),
             boxShadow: isCompleted
-              ? `0 0 18px oklch(0.5 0.15 155 / 40%)`
-              : isActive
-              ? `0 0 18px oklch(0.5 0.12 ${hue} / 40%)`
-              : `0 0 14px oklch(0.5 0.12 ${hue} / 20%)`,
+              ? tc.hueGlow(155, 0.4)
+              : tc.hueGlow(hue, isActive ? 0.4 : 0.2),
           }}
           title={isCompleted ? "Mark incomplete" : "Mark complete"}
         >
           {isCompleted ? "✓" : lesson.order}
         </motion.button>
-        {/* Connecting line */}
         <div
           className="w-px flex-1 min-h-[20px]"
           style={{
             background: isCompleted
-              ? `linear-gradient(to bottom, oklch(0.5 0.12 155 / 70%), oklch(0.3 0.06 155 / 20%))`
-              : `linear-gradient(to bottom, oklch(0.4 0.08 ${hue} / 60%), transparent)`,
+              ? (isDark
+                  ? `linear-gradient(to bottom, oklch(0.5 0.12 155 / 70%), oklch(0.3 0.06 155 / 20%))`
+                  : `linear-gradient(to bottom, oklch(0.6 0.1 155 / 50%), oklch(0.8 0.04 155 / 10%))`)
+              : (isDark
+                  ? `linear-gradient(to bottom, oklch(0.4 0.08 ${hue} / 60%), transparent)`
+                  : `linear-gradient(to bottom, oklch(0.7 0.06 ${hue} / 40%), transparent)`),
           }}
         />
       </div>
@@ -151,23 +158,14 @@ function LessonCard({
       {/* Card */}
       <motion.div
         onClick={() => onActivate(lesson.id)}
-        className="flex-1 rounded-xl border border-white/10 space-y-3 mb-4 cursor-pointer transition-all duration-300"
+        className="flex-1 rounded-xl space-y-3 mb-4 cursor-pointer transition-all duration-300"
         style={{
-          background: isActive
-            ? `oklch(0.15 0.02 ${hue} / 70%)`
-            : "oklch(0.12 0.01 260 / 60%)",
-          backdropFilter: "blur(12px)",
-          boxShadow: isActive
-            ? `0 0 30px oklch(0.4 0.1 ${hue} / 15%), inset 0 1px 0 oklch(1 0 0 / 6%)`
-            : `0 0 20px oklch(0.4 0.08 ${hue} / 8%), inset 0 1px 0 oklch(1 0 0 / 4%)`,
-          borderColor: isActive
-            ? `oklch(0.4 0.08 ${hue} / 40%)`
-            : undefined,
+          background: isActive ? tc.hueBg(hue, 0.7) : tc.cardBg,
+          backdropFilter: tc.backdrop,
+          border: `1px solid ${isActive ? tc.hueBorder(hue) : tc.borderWhite}`,
+          boxShadow: isActive ? tc.shadowActive(hue) : tc.shadow(hue, 0.08),
           opacity: isCompleted && !isActive ? 0.7 : 1,
           padding: isActive ? "20px" : "16px",
-        }}
-        whileHover={{
-          boxShadow: `0 0 30px oklch(0.4 0.1 ${hue} / 18%), inset 0 1px 0 oklch(1 0 0 / 6%)`,
         }}
       >
         {/* Header */}
@@ -175,13 +173,9 @@ function LessonCard({
           <h3
             className="text-sm font-semibold"
             style={{
-              color: isCompleted
-                ? "oklch(0.6 0 0)"
-                : "oklch(0.92 0 0)",
+              color: isCompleted ? tc.muted : tc.heading,
               textDecoration: isCompleted ? "line-through" : undefined,
-              textDecorationColor: isCompleted
-                ? "oklch(0.4 0 0)"
-                : undefined,
+              textDecorationColor: isCompleted ? tc.subtle : undefined,
             }}
           >
             {lesson.title}
@@ -190,19 +184,20 @@ function LessonCard({
             <span
               className="text-xs px-1.5 py-0.5 rounded-full font-medium"
               style={{
-                background: `oklch(0.2 0.04 ${hue} / 60%)`,
-                color: `oklch(0.8 0.1 ${hue})`,
+                background: tc.hueBadgeBg(hue),
+                color: tc.hueBadgeText(hue),
               }}
             >
               {label}
             </span>
-            <span className="text-xs px-1.5 py-0.5 rounded-full bg-white/5 text-muted-foreground">
+            <span className="text-xs px-1.5 py-0.5 rounded-full text-muted-foreground"
+              style={{ background: tc.white(0.05) }}>
               {lesson.estimatedMinutes}min
             </span>
           </div>
         </div>
 
-        {/* Concept tags — clickable, navigate to concept graph */}
+        {/* Concept tags */}
         {lesson.concepts.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {lesson.concepts.map((concept) => (
@@ -216,18 +211,15 @@ function LessonCard({
                 }}
                 className="text-xs px-2 py-0.5 rounded-full font-medium cursor-pointer transition-all duration-200"
                 style={{
-                  background: "oklch(0.18 0.03 300 / 50%)",
-                  color: "oklch(0.75 0.08 300)",
+                  background: tc.tagBg,
+                  color: tc.tagText,
                 }}
                 onMouseEnter={(e) => {
-                  (e.target as HTMLElement).style.background =
-                    "oklch(0.25 0.06 300 / 60%)";
-                  (e.target as HTMLElement).style.boxShadow =
-                    "0 0 10px oklch(0.5 0.1 300 / 30%)";
+                  (e.target as HTMLElement).style.background = tc.tagHoverBg;
+                  (e.target as HTMLElement).style.boxShadow = tc.hueGlow(300, 0.3);
                 }}
                 onMouseLeave={(e) => {
-                  (e.target as HTMLElement).style.background =
-                    "oklch(0.18 0.03 300 / 50%)";
+                  (e.target as HTMLElement).style.background = tc.tagBg;
                   (e.target as HTMLElement).style.boxShadow = "none";
                 }}
                 title={`View "${concept}" in Concept Graph`}
@@ -253,8 +245,8 @@ function LessonCard({
               </p>
               {/* Resources */}
               {lesson.resources?.length > 0 && (
-                <div className="mt-3 pt-3 space-y-2" style={{ borderTop: "1px solid oklch(0.25 0.02 260 / 40%)" }}>
-                  <span className="text-[11px] font-semibold tracking-wide uppercase" style={{ color: "oklch(0.6 0.06 200)" }}>
+                <div className="mt-3 pt-3 space-y-2" style={{ borderTop: `1px solid ${tc.divider}` }}>
+                  <span className="text-[11px] font-semibold tracking-wide uppercase" style={{ color: tc.hueText(200) }}>
                     Resources
                   </span>
                   <div className="grid gap-1.5">
@@ -267,34 +259,34 @@ function LessonCard({
                         onClick={(e) => e.stopPropagation()}
                         className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg transition-all duration-200 group"
                         style={{
-                          background: "oklch(0.13 0.02 260 / 50%)",
-                          border: "1px solid oklch(0.25 0.02 260 / 30%)",
+                          background: tc.panelBg,
+                          border: `1px solid ${tc.divider}`,
                         }}
                         onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLElement).style.background = "oklch(0.18 0.03 200 / 50%)";
-                          (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.35 0.06 200 / 40%)";
+                          e.currentTarget.style.background = tc.hueBg(200, 0.5);
+                          e.currentTarget.style.borderColor = tc.hueBorder(200, 0.4);
                         }}
                         onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLElement).style.background = "oklch(0.13 0.02 260 / 50%)";
-                          (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.25 0.02 260 / 30%)";
+                          e.currentTarget.style.background = tc.panelBg;
+                          e.currentTarget.style.borderColor = tc.divider;
                         }}
                       >
-                        <span className="shrink-0 text-[10px]" style={{ color: "oklch(0.6 0.08 200)" }}>
+                        <span className="shrink-0 text-[10px]">
                           {r.type === "docs" ? "📄" : r.type === "video" ? "🎬" : r.type === "tutorial" ? "📝" : r.type === "article" ? "📰" : "📚"}
                         </span>
-                        <span className="flex-1 truncate" style={{ color: "oklch(0.8 0.04 200)" }}>
+                        <span className="flex-1 truncate" style={{ color: tc.hueText(200) }}>
                           {r.title}
                         </span>
                         <span
                           className="shrink-0 text-[9px] px-1.5 py-0.5 rounded-full font-medium uppercase"
                           style={{
-                            background: "oklch(0.2 0.03 200 / 40%)",
-                            color: "oklch(0.55 0.06 200)",
+                            background: tc.hueBadgeBg(200),
+                            color: tc.hueBadgeText(200),
                           }}
                         >
                           {r.type}
                         </span>
-                        <span className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: "oklch(0.7 0.08 200)" }}>
+                        <span className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: tc.hueText(200) }}>
                           ↗
                         </span>
                       </a>
@@ -304,7 +296,7 @@ function LessonCard({
               )}
 
               {/* Action buttons */}
-              <div className="flex items-center gap-2 mt-3 pt-3" style={{ borderTop: "1px solid oklch(0.25 0.02 260 / 40%)" }}>
+              <div className="flex items-center gap-2 mt-3 pt-3" style={{ borderTop: `1px solid ${tc.divider}` }}>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -315,14 +307,12 @@ function LessonCard({
                   className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all duration-200"
                   style={{
                     background: isCompleted
-                      ? "oklch(0.2 0.04 0 / 50%)"
-                      : "oklch(0.3 0.08 155 / 50%)",
+                      ? tc.hueBg(0, 0.5)
+                      : tc.accentBg(155),
                     color: isCompleted
-                      ? "oklch(0.6 0 0)"
-                      : "oklch(0.85 0.12 155)",
-                    boxShadow: isCompleted
-                      ? "none"
-                      : "0 0 12px oklch(0.5 0.12 155 / 25%)",
+                      ? tc.muted
+                      : tc.accentText(155),
+                    boxShadow: isCompleted ? "none" : tc.hueGlow(155, 0.25),
                   }}
                 >
                   {isCompleted ? "↩ Undo" : "✓ Mark Complete"}
@@ -345,6 +335,9 @@ function LessonCard({
 
 export function LearningPath() {
   const { analysis, setActiveTab, setSelectedConcept } = useStore();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
   const lessons = analysis?.learningPath ?? [];
   const concepts = analysis?.concepts ?? [];
 
@@ -431,20 +424,20 @@ export function LearningPath() {
     <div className="space-y-5">
       {/* Progress overview */}
       <div
-        className="rounded-xl p-5 border border-white/10 flex items-center gap-6"
+        className="rounded-xl p-5 flex items-center gap-6"
         style={{
-          background: "oklch(0.1 0.01 260 / 60%)",
-          backdropFilter: "blur(12px)",
-          boxShadow:
-            "0 0 30px oklch(0.3 0.06 155 / 10%), inset 0 1px 0 oklch(1 0 0 / 4%)",
+          background: tc.panelBg,
+          backdropFilter: tc.backdrop,
+          border: `1px solid ${tc.borderWhite}`,
+          boxShadow: tc.shadow(155, 0.1),
         }}
       >
-        <ProgressRing completed={completedIds.size} total={sorted.length} />
+        <ProgressRing completed={completedIds.size} total={sorted.length} isDark={isDark} />
 
         <div className="flex-1 space-y-2">
           <h2
             className="text-base font-bold"
-            style={{ color: "oklch(0.9 0.06 155)" }}
+            style={{ color: tc.accentText(155) }}
           >
             Learning Path
           </h2>
@@ -455,7 +448,7 @@ export function LearningPath() {
             {completedIds.size > 0 && (
               <>
                 <span>·</span>
-                <span style={{ color: "oklch(0.7 0.1 155)" }}>
+                <span style={{ color: tc.accentText(155) }}>
                   ~{remainingMinutes} min remaining
                 </span>
               </>
@@ -463,13 +456,14 @@ export function LearningPath() {
           </div>
 
           {/* Progress bar */}
-          <div className="w-full h-1.5 rounded-full overflow-hidden bg-white/5">
+          <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: tc.white(0.05) }}>
             <motion.div
               className="h-full rounded-full"
               style={{
-                background:
-                  "linear-gradient(90deg, oklch(0.5 0.15 155), oklch(0.6 0.15 80))",
-                boxShadow: "0 0 8px oklch(0.5 0.15 155 / 40%)",
+                background: isDark
+                  ? "linear-gradient(90deg, oklch(0.5 0.15 155), oklch(0.6 0.15 80))"
+                  : "linear-gradient(90deg, oklch(0.45 0.18 155), oklch(0.5 0.15 80))",
+                boxShadow: isDark ? "0 0 8px oklch(0.5 0.15 155 / 40%)" : "none",
               }}
               initial={{ width: 0 }}
               animate={{
@@ -491,11 +485,12 @@ export function LearningPath() {
               onClick={startNextLesson}
               className="text-xs font-semibold px-4 py-2 rounded-lg mt-1 transition-all cursor-pointer"
               style={{
-                background:
-                  "linear-gradient(135deg, oklch(0.3 0.08 155 / 70%), oklch(0.25 0.06 80 / 70%))",
-                color: "oklch(0.9 0.08 155)",
-                boxShadow: "0 0 16px oklch(0.5 0.12 155 / 25%)",
-                border: "1px solid oklch(0.4 0.1 155 / 30%)",
+                background: isDark
+                  ? "linear-gradient(135deg, oklch(0.3 0.08 155 / 70%), oklch(0.25 0.06 80 / 70%))"
+                  : "linear-gradient(135deg, oklch(0.45 0.12 155 / 90%), oklch(0.5 0.1 80 / 90%))",
+                color: isDark ? "oklch(0.9 0.08 155)" : "oklch(0.98 0 0)",
+                boxShadow: tc.hueGlow(155, 0.25),
+                border: `1px solid ${tc.hueBorder(155, 0.3)}`,
               }}
             >
               {completedIds.size === 0 ? "▶ Start Learning" : "▶ Continue"}
@@ -505,9 +500,9 @@ export function LearningPath() {
             <div
               className="text-xs font-bold px-3 py-1.5 rounded-lg inline-block"
               style={{
-                background: "oklch(0.25 0.06 155 / 50%)",
-                color: "oklch(0.85 0.12 155)",
-                boxShadow: "0 0 20px oklch(0.5 0.15 155 / 30%)",
+                background: tc.accentBg(155),
+                color: tc.accentText(155),
+                boxShadow: tc.hueGlow(155, 0.3),
               }}
             >
               🎉 All lessons completed!
@@ -532,18 +527,12 @@ export function LearningPath() {
               onClick={() => setDifficultyFilter(f.key)}
               className="text-xs px-3 py-1.5 rounded-lg font-medium transition-all duration-200 cursor-pointer"
               style={{
-                background: isActive
-                  ? `oklch(0.25 0.06 ${f.hue} / 60%)`
-                  : "oklch(0.15 0.02 260 / 40%)",
-                color: isActive
-                  ? `oklch(0.85 0.1 ${f.hue})`
-                  : "oklch(0.55 0 0)",
+                background: isActive ? tc.accentBg(f.hue) : tc.sectionBg,
+                color: isActive ? tc.accentText(f.hue) : tc.muted,
                 border: isActive
-                  ? `1px solid oklch(0.4 0.08 ${f.hue} / 40%)`
-                  : "1px solid oklch(0.2 0 0 / 30%)",
-                boxShadow: isActive
-                  ? `0 0 12px oklch(0.5 0.1 ${f.hue} / 20%)`
-                  : "none",
+                  ? `1px solid ${tc.hueBorder(f.hue)}`
+                  : `1px solid ${tc.divider}`,
+                boxShadow: isActive ? tc.hueGlow(f.hue) : "none",
               }}
             >
               {f.label} ({count})
@@ -562,6 +551,7 @@ export function LearningPath() {
               index={i}
               isCompleted={completedIds.has(lesson.id)}
               isActive={activeLesson === lesson.id}
+              isDark={isDark}
               onToggleComplete={toggleComplete}
               onActivate={(id) =>
                 setActiveLesson((prev) => (prev === id ? null : id))

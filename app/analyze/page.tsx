@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import { useStore } from "@/lib/store";
 import { AnalysisTabs } from "@/components/analysis-tabs";
 import { PipelineView } from "@/components/pipeline-view";
@@ -24,6 +25,8 @@ const VIEW_MAP: Record<AnalysisTab, React.ComponentType> = {
 export default function AnalyzePage() {
   const { analysis, isAnalyzing, analyzeProgress, analyzeStatus, activeTab } =
     useStore();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   if (!analysis && !isAnalyzing) {
     return (
@@ -76,7 +79,7 @@ export default function AnalyzePage() {
             <p className="text-sm text-muted-foreground/60">
               {analyzeStatus || "Analyzing codebase..."}
             </p>
-            <div className="w-64 h-1.5 rounded-full bg-[oklch(0.15_0.01_260)] overflow-hidden mx-auto">
+            <div className={`w-64 h-1.5 rounded-full overflow-hidden mx-auto ${isDark ? "bg-[oklch(0.15_0.01_260)]" : "bg-[oklch(0.9_0.005_260)]"}`}>
               <motion.div
                 className="h-full rounded-full"
                 style={{
@@ -115,7 +118,9 @@ export default function AnalyzePage() {
             ← Home
           </Link>
           <h1 className="text-2xl font-bold tracking-tighter">
-            <span className="bg-gradient-to-r from-[oklch(0.75_0.18_260)] to-[oklch(0.8_0.15_195)] bg-clip-text text-transparent">
+            <span className={`bg-gradient-to-r bg-clip-text text-transparent ${isDark
+              ? "from-[oklch(0.75_0.18_260)] to-[oklch(0.8_0.15_195)]"
+              : "from-[oklch(0.45_0.22_260)] to-[oklch(0.5_0.18_195)]"}`}>
               Vibe
             </span>
             <span className="text-foreground/30">Scope</span>

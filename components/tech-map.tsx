@@ -14,6 +14,8 @@ import {
 import "@xyflow/react/dist/style.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/lib/store";
+import { useTheme } from "next-themes";
+import { themeColors } from "@/lib/theme-colors";
 import type { Technology, TechCategory } from "@/lib/types";
 
 /* ─── Category color hues (oklch) ─── */
@@ -51,6 +53,10 @@ function hue(category: TechCategory) {
 
 /* ─── Central project node ─── */
 function CenterNode(_props: NodeProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
+
   return (
     <motion.div
       initial={{ scale: 0 }}
@@ -61,18 +67,16 @@ function CenterNode(_props: NodeProps) {
       <div
         className="w-28 h-28 rounded-full flex items-center justify-center"
         style={{
-          background:
-            "radial-gradient(circle, oklch(0.25 0.04 260 / 90%) 0%, oklch(0.12 0.02 260 / 80%) 100%)",
-          border: "1px solid oklch(0.5 0.1 260 / 30%)",
-          boxShadow:
-            "0 0 40px oklch(0.5 0.12 260 / 20%), inset 0 0 30px oklch(0.5 0.1 260 / 10%)",
+          background: `radial-gradient(circle, ${tc.accentBg(260)} 0%, ${tc.cardBg} 100%)`,
+          border: `1px solid ${tc.hueBorder(260, 0.3)}`,
+          boxShadow: tc.shadowActive(260),
         }}
       >
         <div className="text-center">
           <div className="text-2xl mb-0.5">◎</div>
           <div
             className="text-xs font-bold tracking-widest uppercase"
-            style={{ color: "oklch(0.85 0.08 260)" }}
+            style={{ color: tc.accentText(260) }}
           >
             Project
           </div>
@@ -90,6 +94,9 @@ function CenterNode(_props: NodeProps) {
 /* ─── Tech node (custom) ─── */
 function TechNode({ data }: NodeProps) {
   const [expanded, setExpanded] = useState(false);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
   const tech = data.tech as Technology;
   const h = hue(tech.category);
 
@@ -113,12 +120,12 @@ function TechNode({ data }: NodeProps) {
       <div
         className="rounded-xl px-4 py-3 cursor-pointer select-none transition-all duration-200"
         style={{
-          background: `oklch(0.14 0.02 ${h} / 85%)`,
-          border: `1px solid oklch(0.4 0.08 ${h} / 30%)`,
+          background: tc.hueBg(h, 0.85),
+          border: `1px solid ${tc.hueBorder(h, 0.3)}`,
           boxShadow: expanded
-            ? `0 0 30px oklch(0.6 0.15 ${h} / 25%), inset 0 0 20px oklch(0.5 0.08 ${h} / 8%)`
-            : `0 0 15px oklch(0.5 0.1 ${h} / 12%)`,
-          backdropFilter: "blur(12px)",
+            ? tc.shadowActive(h)
+            : tc.hueGlow(h, 0.12),
+          backdropFilter: tc.backdrop,
           minWidth: 160,
           maxWidth: 260,
         }}
@@ -129,7 +136,7 @@ function TechNode({ data }: NodeProps) {
           {tech.icon && <span className="text-lg">{tech.icon}</span>}
           <span
             className="font-semibold text-base leading-tight"
-            style={{ color: `oklch(0.92 0.06 ${h})` }}
+            style={{ color: tc.hueText(h) }}
           >
             {tech.name}
           </span>
@@ -140,8 +147,8 @@ function TechNode({ data }: NodeProps) {
           <span
             className="text-[11px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md"
             style={{
-              background: `oklch(0.3 0.06 ${h} / 50%)`,
-              color: `oklch(0.78 0.1 ${h})`,
+              background: tc.hueBadgeBg(h),
+              color: tc.hueBadgeText(h),
             }}
           >
             {CATEGORY_LABEL[tech.category]}
@@ -150,8 +157,8 @@ function TechNode({ data }: NodeProps) {
             <span
               className="text-[11px] font-mono px-1.5 py-0.5 rounded-md"
               style={{
-                background: "oklch(0.2 0.01 0 / 50%)",
-                color: "oklch(0.65 0 0)",
+                background: tc.white(0.05),
+                color: tc.muted,
               }}
             >
               v{tech.version}
@@ -163,7 +170,7 @@ function TechNode({ data }: NodeProps) {
         <p
           className="text-xs leading-relaxed mt-1"
           style={{
-            color: "oklch(0.7 0.02 0)",
+            color: tc.body,
             display: "-webkit-box",
             WebkitLineClamp: expanded ? 99 : 2,
             WebkitBoxOrient: "vertical",
@@ -184,14 +191,14 @@ function TechNode({ data }: NodeProps) {
               className="overflow-hidden"
             >
               {/* Why chosen */}
-              <div className="mt-2 pt-2" style={{ borderTop: `1px solid oklch(0.3 0.04 ${h} / 40%)` }}>
+              <div className="mt-2 pt-2" style={{ borderTop: `1px solid ${tc.hueBorder(h, 0.4)}` }}>
                 <div
                   className="text-[11px] uppercase tracking-wider font-bold mb-0.5"
-                  style={{ color: `oklch(0.65 0.08 ${h})` }}
+                  style={{ color: tc.accentText(h) }}
                 >
                   Why chosen
                 </div>
-                <p className="text-xs leading-relaxed" style={{ color: "oklch(0.68 0.02 0)" }}>
+                <p className="text-xs leading-relaxed" style={{ color: tc.body }}>
                   {tech.whyChosen}
                 </p>
               </div>
@@ -205,14 +212,14 @@ function TechNode({ data }: NodeProps) {
                   onClick={(e) => e.stopPropagation()}
                   className="inline-block mt-2 text-[11px] font-bold uppercase tracking-wider px-2 py-1 rounded-md transition-colors"
                   style={{
-                    background: `oklch(0.3 0.06 ${h} / 40%)`,
-                    color: `oklch(0.78 0.12 ${h})`,
+                    background: tc.hueBadgeBg(h),
+                    color: tc.accentText(h),
                   }}
                   onMouseEnter={(e) => {
-                    (e.target as HTMLElement).style.background = `oklch(0.4 0.08 ${h} / 50%)`;
+                    (e.target as HTMLElement).style.background = tc.accentBg(h);
                   }}
                   onMouseLeave={(e) => {
-                    (e.target as HTMLElement).style.background = `oklch(0.3 0.06 ${h} / 40%)`;
+                    (e.target as HTMLElement).style.background = tc.hueBadgeBg(h);
                   }}
                 >
                   Docs &rarr;
@@ -240,7 +247,7 @@ const nodeTypes = {
 };
 
 /* ─── Layout: radial arrangement grouped by category ─── */
-function buildLayout(technologies: Technology[]) {
+function buildLayout(technologies: Technology[], tc: ReturnType<typeof themeColors>) {
   const centerX = 0;
   const centerY = 0;
 
@@ -303,7 +310,7 @@ function buildLayout(technologies: Technology[]) {
         source: "center",
         target: tech.id,
         style: {
-          stroke: `oklch(0.45 0.1 ${h})`,
+          stroke: tc.hueText(h),
           strokeWidth: 1.5,
         },
         animated: true,
@@ -320,10 +327,14 @@ function buildLayout(technologies: Technology[]) {
 export function TechMap() {
   const analysis = useStore((s) => s.analysis);
   const technologies = analysis?.technologies ?? [];
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
 
   const { nodes, edges } = useMemo(
-    () => buildLayout(technologies),
-    [technologies]
+    () => buildLayout(technologies, tc),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [technologies, isDark]
   );
 
   const onInit = useCallback((instance: { fitView: () => void }) => {
@@ -339,10 +350,10 @@ export function TechMap() {
           className="text-center"
         >
           <div className="text-4xl mb-3 opacity-30">◎</div>
-          <p className="text-sm" style={{ color: "oklch(0.5 0 0)" }}>
+          <p className="text-sm" style={{ color: tc.muted }}>
             No analysis data yet.
           </p>
-          <p className="text-xs mt-1" style={{ color: "oklch(0.4 0 0)" }}>
+          <p className="text-xs mt-1" style={{ color: tc.subtle }}>
             Analyze a codebase to see its technology map.
           </p>
         </motion.div>
@@ -359,7 +370,7 @@ export function TechMap() {
           className="text-center"
         >
           <div className="text-4xl mb-3 opacity-30">◎</div>
-          <p className="text-sm" style={{ color: "oklch(0.5 0 0)" }}>
+          <p className="text-sm" style={{ color: tc.muted }}>
             No technologies detected.
           </p>
         </motion.div>
@@ -374,8 +385,8 @@ export function TechMap() {
       transition={{ duration: 0.5 }}
       className="w-full h-[700px] rounded-2xl overflow-hidden"
       style={{
-        background: "oklch(0.08 0.01 260 / 60%)",
-        border: "1px solid oklch(0.25 0.03 260 / 30%)",
+        background: tc.panelBg,
+        border: `1px solid ${tc.divider}`,
       }}
     >
       <ReactFlow
@@ -392,11 +403,14 @@ export function TechMap() {
         }}
       >
         <Controls
-          className="!bg-black/40 !border-white/10 !rounded-lg [&>button]:!bg-black/50 [&>button]:!border-white/10 [&>button]:!text-white/60 [&>button:hover]:!bg-white/10"
+          className={isDark
+            ? "!bg-black/40 !border-white/10 !rounded-lg [&>button]:!bg-black/50 [&>button]:!border-white/10 [&>button]:!text-white/60 [&>button:hover]:!bg-white/10"
+            : "!bg-white/60 !border-black/10 !rounded-lg [&>button]:!bg-white/70 [&>button]:!border-black/10 [&>button]:!text-black/50 [&>button:hover]:!bg-black/5"
+          }
           showInteractive={false}
         />
         <Background
-          color="oklch(0.3 0.02 260 / 20%)"
+          color={isDark ? "oklch(0.3 0.02 260 / 20%)" : "oklch(0.7 0.02 260 / 15%)"}
           gap={40}
           size={1}
         />

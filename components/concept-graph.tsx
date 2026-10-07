@@ -14,6 +14,8 @@ import {
 import "@xyflow/react/dist/style.css";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/lib/store";
+import { useTheme } from "next-themes";
+import { themeColors } from "@/lib/theme-colors";
 import type { Concept, Difficulty } from "@/lib/types";
 
 const DIFFICULTY_COLORS: Record<Difficulty, { hue: string; label: string }> = {
@@ -38,6 +40,9 @@ function ConceptNodeComponent({ data }: NodeProps<Node<ConceptNodeData>>) {
   const concept = data.concept;
   const { hue, label } = DIFFICULTY_COLORS[concept.difficulty];
   const setSelectedConcept = useStore((s) => s.setSelectedConcept);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
 
   return (
     <>
@@ -48,18 +53,19 @@ function ConceptNodeComponent({ data }: NodeProps<Node<ConceptNodeData>>) {
           setExpanded(!expanded);
           setSelectedConcept(concept.id);
         }}
-        className="cursor-pointer rounded-xl p-3 min-w-[180px] max-w-[260px] border border-white/10"
+        className="cursor-pointer rounded-xl p-3 min-w-[180px] max-w-[260px]"
         style={{
-          background: `oklch(0.12 0.02 ${hue} / 80%)`,
-          backdropFilter: "blur(12px)",
-          boxShadow: `0 0 20px oklch(0.5 0.12 ${hue} / 15%), inset 0 1px 0 oklch(1 0 0 / 5%)`,
+          background: tc.hueBg(hue, 0.8),
+          backdropFilter: tc.backdrop,
+          boxShadow: tc.hueGlow(hue, 0.15),
+          border: `1px solid ${tc.borderWhite}`,
         }}
       >
         <div className="space-y-1.5">
           <div className="flex items-center justify-between gap-2">
             <span
               className="text-sm font-semibold truncate"
-              style={{ color: `oklch(0.9 0.08 ${hue})` }}
+              style={{ color: tc.hueText(hue) }}
             >
               {concept.name}
             </span>
@@ -68,13 +74,19 @@ function ConceptNodeComponent({ data }: NodeProps<Node<ConceptNodeData>>) {
             <span
               className="text-xs px-1.5 py-0.5 rounded-full font-medium"
               style={{
-                background: `oklch(0.25 0.04 ${hue} / 60%)`,
-                color: `oklch(0.8 0.1 ${hue})`,
+                background: tc.hueBadgeBg(hue),
+                color: tc.hueBadgeText(hue),
               }}
             >
               {label}
             </span>
-            <span className="text-xs px-1.5 py-0.5 rounded-full bg-white/5 text-muted-foreground">
+            <span
+              className="text-xs px-1.5 py-0.5 rounded-full"
+              style={{
+                background: tc.white(0.05),
+                color: tc.muted,
+              }}
+            >
               {concept.category}
             </span>
           </div>
@@ -87,7 +99,10 @@ function ConceptNodeComponent({ data }: NodeProps<Node<ConceptNodeData>>) {
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <p className="text-xs text-foreground/60 leading-relaxed mt-1.5">
+                <p
+                  className="text-xs leading-relaxed mt-1.5"
+                  style={{ color: tc.body }}
+                >
                   {concept.explanation}
                 </p>
                 {concept.docUrl && (
@@ -96,7 +111,7 @@ function ConceptNodeComponent({ data }: NodeProps<Node<ConceptNodeData>>) {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs mt-1 inline-block underline"
-                    style={{ color: `oklch(0.7 0.1 220)` }}
+                    style={{ color: tc.hueText(220) }}
                     onClick={(e) => e.stopPropagation()}
                   >
                     Docs
@@ -116,6 +131,9 @@ const nodeTypes = { concept: ConceptNodeComponent };
 
 export function ConceptGraph() {
   const { analysis, setSelectedConcept } = useStore();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
 
   const concepts = analysis?.concepts ?? [];
   const conceptEdges = analysis?.conceptEdges ?? [];
@@ -166,19 +184,19 @@ export function ConceptGraph() {
         target: e.to,
         animated: e.relationship === "prerequisite",
         style: {
-          stroke: `oklch(0.5 0.1 ${relColor})`,
+          stroke: tc.hueText(relColor),
           strokeWidth: 1.5,
         },
         label: e.relationship,
         labelStyle: {
-          fill: "oklch(0.6 0 0)",
+          fill: tc.muted,
           fontSize: 9,
         },
       };
     });
 
     return { nodes: allNodes, edges: allEdges };
-  }, [concepts, conceptEdges]);
+  }, [concepts, conceptEdges, tc]);
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
@@ -220,7 +238,7 @@ export function ConceptGraph() {
         minZoom={0.3}
         maxZoom={1.5}
       >
-        <Background color="oklch(0.3 0 0 / 30%)" gap={20} size={1} />
+        <Background color={isDark ? "oklch(0.3 0 0 / 30%)" : "oklch(0.7 0 0 / 20%)"} gap={20} size={1} />
         <Controls
           showInteractive={false}
           className="[&>button]:!bg-white/5 [&>button]:!border-white/10 [&>button]:!text-foreground [&>button]:!fill-foreground"
@@ -234,7 +252,7 @@ export function ConceptGraph() {
             <div key={d} className="flex items-center gap-1.5">
               <span
                 className="w-2 h-2 rounded-full"
-                style={{ background: `oklch(0.7 0.15 ${hue})` }}
+                style={{ background: tc.hueText(hue) }}
               />
               <span className="text-xs text-muted-foreground">{label}</span>
             </div>

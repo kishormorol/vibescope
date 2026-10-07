@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "next-themes";
+import { themeColors } from "@/lib/theme-colors";
 import type { AnalyzedFile, Difficulty } from "@/lib/types";
 
 type AnatomyTab = "code" | "annotations" | "summary";
@@ -37,6 +39,10 @@ interface FileAnatomyProps {
 }
 
 export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
+  const tc = themeColors(isDark);
+
   const [activeTab, setActiveTab] = useState<AnatomyTab>(
     sourceCode ? "code" : "annotations"
   );
@@ -131,11 +137,11 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
         lineEl.style.cursor = "pointer";
         lineEl.style.display = "block";
         lineEl.style.paddingLeft = "6px";
-        lineEl.style.borderLeft = `3px solid oklch(0.7 0.15 ${hue})`;
+        lineEl.style.borderLeft = `3px solid ${tc.hueText(hue)}`;
         lineEl.style.marginLeft = "-3px";
       }
     });
-  }, [highlightedHtml, lineAnnotationMap]);
+  }, [highlightedHtml, lineAnnotationMap, isDark]);
 
   // Handle click on annotated lines
   const handleCodeClick = (e: React.MouseEvent) => {
@@ -157,7 +163,7 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Tab bar */}
-      <div className="flex items-center gap-1 px-4 pt-3 pb-2 border-b border-white/5">
+      <div className="flex items-center gap-1 px-4 pt-3 pb-2 border-b" style={{ borderColor: tc.divider }}>
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -167,13 +173,13 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
             style={{
               color:
                 activeTab === tab.id
-                  ? "oklch(0.9 0.05 155)"
+                  ? tc.accentText(155)
                   : tab.disabled
-                    ? "oklch(0.35 0 0)"
-                    : "oklch(0.6 0 0)",
+                    ? tc.subtle
+                    : tc.muted,
               background:
                 activeTab === tab.id
-                  ? "oklch(0.2 0.04 155 / 50%)"
+                  ? tc.accentBg(155)
                   : "transparent",
             }}
           >
@@ -182,7 +188,7 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
               <motion.div
                 layoutId="anatomy-tab-indicator"
                 className="absolute bottom-0 left-1 right-1 h-0.5 rounded-full"
-                style={{ background: "oklch(0.7 0.15 155)" }}
+                style={{ background: tc.hueText(155) }}
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
               />
             )}
@@ -193,8 +199,8 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
           <span
             className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full"
             style={{
-              background: "oklch(0.2 0.04 300 / 40%)",
-              color: "oklch(0.75 0.1 300)",
+              background: tc.hueBadgeBg(300),
+              color: tc.hueBadgeText(300),
             }}
           >
             {file.annotations.length} annotation
@@ -227,7 +233,7 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
                 <div className="flex items-center justify-center py-12">
                   <div
                     className="text-xs"
-                    style={{ color: "oklch(0.5 0.05 155)" }}
+                    style={{ color: tc.hueText(155) }}
                   >
                     Loading syntax highlighting...
                   </div>
@@ -245,17 +251,17 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
                       transition={{ duration: 0.15 }}
                       className="mx-4 mb-4 p-3 rounded-lg border"
                       style={{
-                        background: "oklch(0.12 0.02 260 / 90%)",
-                        borderColor: `oklch(0.4 0.1 ${DIFFICULTY_COLORS[file.difficulty].hue} / 40%)`,
-                        backdropFilter: "blur(12px)",
+                        background: tc.cardBg,
+                        borderColor: tc.hueBorder(DIFFICULTY_COLORS[file.difficulty].hue),
+                        backdropFilter: tc.backdrop,
                       }}
                     >
                       <div className="flex items-center gap-2 mb-2">
                         <span
                           className="text-[10px] font-mono px-1.5 py-0.5 rounded"
                           style={{
-                            background: `oklch(0.2 0.04 ${DIFFICULTY_COLORS[file.difficulty].hue} / 60%)`,
-                            color: `oklch(0.8 0.12 ${DIFFICULTY_COLORS[file.difficulty].hue})`,
+                            background: tc.hueBadgeBg(DIFFICULTY_COLORS[file.difficulty].hue),
+                            color: tc.hueBadgeText(DIFFICULTY_COLORS[file.difficulty].hue),
                           }}
                         >
                           L
@@ -266,21 +272,21 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
                         </span>
                         <span
                           className="text-[10px] font-medium"
-                          style={{ color: "oklch(0.7 0.08 300)" }}
+                          style={{ color: tc.hueText(300) }}
                         >
                           {file.annotations[expandedAnnotation].conceptId}
                         </span>
                         <button
                           onClick={() => setExpandedAnnotation(null)}
                           className="ml-auto text-[10px] px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors"
-                          style={{ color: "oklch(0.5 0 0)" }}
+                          style={{ color: tc.muted }}
                         >
                           Close
                         </button>
                       </div>
                       <p
                         className="text-xs leading-relaxed"
-                        style={{ color: "oklch(0.8 0.02 260)" }}
+                        style={{ color: tc.body }}
                       >
                         {file.annotations[expandedAnnotation].explanation}
                       </p>
@@ -290,7 +296,7 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 mt-2 text-[10px] underline transition-opacity hover:opacity-80"
-                          style={{ color: "oklch(0.7 0.12 220)" }}
+                          style={{ color: tc.accentText(220) }}
                         >
                           View documentation
                         </a>
@@ -309,9 +315,9 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
                       exit={{ opacity: 0 }}
                       className="fixed z-50 px-2.5 py-1.5 rounded-md shadow-lg text-[10px] max-w-xs pointer-events-none"
                       style={{
-                        background: "oklch(0.15 0.02 260 / 95%)",
-                        border: "1px solid oklch(0.3 0.05 260)",
-                        color: "oklch(0.8 0.02 260)",
+                        background: tc.sectionBg,
+                        border: `1px solid ${tc.divider}`,
+                        color: tc.body,
                       }}
                     >
                       {file.annotations[hoveredAnnotation].explanation.slice(
@@ -337,7 +343,7 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
               {file.annotations.length === 0 ? (
                 <p
                   className="text-xs text-center py-8"
-                  style={{ color: "oklch(0.5 0 0)" }}
+                  style={{ color: tc.muted }}
                 >
                   No annotations for this file.
                 </p>
@@ -352,17 +358,17 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
                       transition={{ delay: i * 0.05 }}
                       className="p-3 rounded-lg border space-y-2"
                       style={{
-                        background: "oklch(0.1 0.01 260 / 40%)",
-                        borderColor: "oklch(0.25 0.02 260)",
-                        borderLeft: `3px solid oklch(0.7 0.15 ${hue})`,
+                        background: tc.panelBg,
+                        borderColor: tc.divider,
+                        borderLeft: `3px solid ${tc.hueText(hue)}`,
                       }}
                     >
                       <div className="flex items-center gap-2">
                         <span
                           className="text-[10px] font-mono px-1.5 py-0.5 rounded"
                           style={{
-                            background: `oklch(0.2 0.04 ${hue} / 60%)`,
-                            color: `oklch(0.8 0.12 ${hue})`,
+                            background: tc.hueBadgeBg(hue),
+                            color: tc.hueBadgeText(hue),
                           }}
                         >
                           L{ann.startLine}
@@ -371,14 +377,14 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
                         </span>
                         <span
                           className="text-[10px] font-medium"
-                          style={{ color: "oklch(0.7 0.08 300)" }}
+                          style={{ color: tc.hueText(300) }}
                         >
                           {ann.conceptId}
                         </span>
                       </div>
                       <p
                         className="text-xs leading-relaxed"
-                        style={{ color: "oklch(0.75 0.02 260)" }}
+                        style={{ color: tc.body }}
                       >
                         {ann.explanation}
                       </p>
@@ -388,7 +394,7 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-[10px] underline transition-opacity hover:opacity-80"
-                          style={{ color: "oklch(0.7 0.12 220)" }}
+                          style={{ color: tc.accentText(220) }}
                         >
                           View documentation
                         </a>
@@ -412,13 +418,13 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
               <div className="space-y-1.5">
                 <h3
                   className="text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: "oklch(0.55 0.05 155)" }}
+                  style={{ color: tc.hueText(155) }}
                 >
                   Overview
                 </h3>
                 <p
                   className="text-sm leading-relaxed"
-                  style={{ color: "oklch(0.8 0.02 260)" }}
+                  style={{ color: tc.body }}
                 >
                   {file.summary}
                 </p>
@@ -428,7 +434,7 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
                 <div className="space-y-2">
                   <h3
                     className="text-xs font-semibold uppercase tracking-wider"
-                    style={{ color: "oklch(0.55 0.05 155)" }}
+                    style={{ color: tc.hueText(155) }}
                   >
                     Concepts Used
                   </h3>
@@ -438,9 +444,9 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
                         key={conceptId}
                         className="px-2.5 py-1 rounded-lg text-xs font-medium"
                         style={{
-                          background: "oklch(0.2 0.04 300 / 50%)",
-                          color: "oklch(0.8 0.1 300)",
-                          boxShadow: "0 0 8px oklch(0.6 0.1 300 / 15%)",
+                          background: tc.tagBg,
+                          color: tc.tagText,
+                          boxShadow: tc.hueGlow(300),
                         }}
                       >
                         {conceptId}
@@ -454,19 +460,19 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
                 <div
                   className="p-3 rounded-lg text-center"
                   style={{
-                    background: "oklch(0.1 0.01 260 / 40%)",
-                    border: "1px solid oklch(0.25 0.02 260)",
+                    background: tc.panelBg,
+                    border: `1px solid ${tc.divider}`,
                   }}
                 >
                   <div
                     className="text-lg font-semibold font-mono"
-                    style={{ color: "oklch(0.85 0.08 155)" }}
+                    style={{ color: tc.accentText(155) }}
                   >
                     {file.lines}
                   </div>
                   <div
                     className="text-[10px] uppercase tracking-wider"
-                    style={{ color: "oklch(0.5 0 0)" }}
+                    style={{ color: tc.muted }}
                   >
                     Lines
                   </div>
@@ -474,19 +480,19 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
                 <div
                   className="p-3 rounded-lg text-center"
                   style={{
-                    background: "oklch(0.1 0.01 260 / 40%)",
-                    border: "1px solid oklch(0.25 0.02 260)",
+                    background: tc.panelBg,
+                    border: `1px solid ${tc.divider}`,
                   }}
                 >
                   <div
                     className="text-lg font-semibold font-mono"
-                    style={{ color: "oklch(0.85 0.08 220)" }}
+                    style={{ color: tc.accentText(220) }}
                   >
                     {file.annotations.length}
                   </div>
                   <div
                     className="text-[10px] uppercase tracking-wider"
-                    style={{ color: "oklch(0.5 0 0)" }}
+                    style={{ color: tc.muted }}
                   >
                     Annotations
                   </div>
@@ -494,19 +500,19 @@ export function FileAnatomy({ file, sourceCode }: FileAnatomyProps) {
                 <div
                   className="p-3 rounded-lg text-center"
                   style={{
-                    background: "oklch(0.1 0.01 260 / 40%)",
-                    border: "1px solid oklch(0.25 0.02 260)",
+                    background: tc.panelBg,
+                    border: `1px solid ${tc.divider}`,
                   }}
                 >
                   <div
                     className="text-lg font-semibold font-mono"
-                    style={{ color: "oklch(0.85 0.08 300)" }}
+                    style={{ color: tc.accentText(300) }}
                   >
                     {file.concepts.length}
                   </div>
                   <div
                     className="text-[10px] uppercase tracking-wider"
-                    style={{ color: "oklch(0.5 0 0)" }}
+                    style={{ color: tc.muted }}
                   >
                     Concepts
                   </div>
