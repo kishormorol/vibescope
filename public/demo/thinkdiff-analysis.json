@@ -1204,7 +1204,24 @@
         "react-components"
       ],
       "content": "React is a library for building user interfaces from reusable pieces called components. Each component is a function that returns JSX, a syntax that looks like HTML but lives inside JavaScript. Components accept inputs called props and can be nested to build complex UIs. In ThinkDiff, every visual element is a component: the prompt input, each trace panel, and even individual reasoning phase nodes in the tree visualization. Start by reading the React docs on 'Your First Component' and practice creating a simple component that accepts and displays props.",
-      "estimatedMinutes": 45
+      "estimatedMinutes": 45,
+      "resources": [
+        {
+          "title": "React: Your First Component",
+          "url": "https://react.dev/learn/your-first-component",
+          "type": "docs"
+        },
+        {
+          "title": "React: Describing the UI",
+          "url": "https://react.dev/learn/describing-the-ui",
+          "type": "tutorial"
+        },
+        {
+          "title": "MDN: JavaScript Basics",
+          "url": "https://developer.mozilla.org/en-US/docs/Learn/Getting_started_with_the_web/JavaScript_basics",
+          "type": "reference"
+        }
+      ]
     },
     {
       "id": "lesson-typescript",
@@ -1215,7 +1232,24 @@
         "typescript-interfaces"
       ],
       "content": "TypeScript adds static types to JavaScript, catching bugs before your code runs. Interfaces define the shape of objects: what properties they have and what types those properties are. In ThinkDiff, interfaces like ParsedTrace and ReasoningPhase ensure that data maintains its structure as it flows from the LLM parser to the store to the UI. Learn to define interfaces, use union types for values that can be one of several types, and understand how TypeScript's compiler catches errors that would otherwise be runtime bugs.",
-      "estimatedMinutes": 60
+      "estimatedMinutes": 60,
+      "resources": [
+        {
+          "title": "TypeScript Handbook",
+          "url": "https://www.typescriptlang.org/docs/handbook/intro.html",
+          "type": "docs"
+        },
+        {
+          "title": "TypeScript for JS Programmers",
+          "url": "https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html",
+          "type": "tutorial"
+        },
+        {
+          "title": "React TypeScript Cheatsheet",
+          "url": "https://react-typescript-cheatsheet.netlify.app/",
+          "type": "reference"
+        }
+      ]
     },
     {
       "id": "lesson-state-management",
@@ -1227,7 +1261,24 @@
         "react-hooks"
       ],
       "content": "State management solves the problem of sharing data between components without passing props through every level. Zustand creates a global store as a React hook with zero boilerplate. You define state and actions in a single create() call, then use the hook in any component with optional selectors for performance. In ThinkDiff, the store holds all trace data, selected models, and UI state. Learn how Zustand compares to useState for local state, how selectors prevent unnecessary re-renders, and how middleware adds features like persistence.",
-      "estimatedMinutes": 40
+      "estimatedMinutes": 40,
+      "resources": [
+        {
+          "title": "Zustand Documentation",
+          "url": "https://zustand-demo.pmnd.rs/",
+          "type": "docs"
+        },
+        {
+          "title": "Zustand GitHub",
+          "url": "https://github.com/pmndrs/zustand",
+          "type": "reference"
+        },
+        {
+          "title": "React: Managing State",
+          "url": "https://react.dev/learn/managing-state",
+          "type": "tutorial"
+        }
+      ]
     },
     {
       "id": "lesson-nextjs-apis",
@@ -1241,7 +1292,24 @@
         "client-components"
       ],
       "content": "Next.js App Router provides file-system based routing where folder structure maps to URL paths. Route handlers (route.ts files) create API endpoints by exporting functions for HTTP methods like GET and POST. Understanding the distinction between server components (default, no JavaScript sent to client) and client components ('use client' directive, interactive) is crucial. In ThinkDiff, the landing page is a server component for fast loading, while the comparison view is a client component for interactivity, and the /api/execute endpoint handles LLM calls on the server.",
-      "estimatedMinutes": 50
+      "estimatedMinutes": 50,
+      "resources": [
+        {
+          "title": "Next.js Route Handlers",
+          "url": "https://nextjs.org/docs/app/building-your-application/routing/route-handlers",
+          "type": "docs"
+        },
+        {
+          "title": "Next.js: API Routes Guide",
+          "url": "https://nextjs.org/docs/app/api-reference",
+          "type": "reference"
+        },
+        {
+          "title": "MDN: Fetch API",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API",
+          "type": "reference"
+        }
+      ]
     },
     {
       "id": "lesson-llm-apis",
@@ -1254,7 +1322,24 @@
         "parallel-execution"
       ],
       "content": "Integrating with LLM APIs involves initializing SDK clients, constructing request payloads, and handling responses. Each provider has its own SDK and conventions: Anthropic's SDK for Claude, OpenAI's SDK for both o3 and DeepSeek (which is OpenAI-compatible). Extended thinking features expose the model's reasoning chain. ThinkDiff uses Promise.all to call all three providers in parallel, reducing wait time. Learn how to configure API keys securely via environment variables, handle errors and timeouts, and normalize different response formats into a common interface.",
-      "estimatedMinutes": 55
+      "estimatedMinutes": 55,
+      "resources": [
+        {
+          "title": "Anthropic API Docs",
+          "url": "https://docs.anthropic.com/en/docs/intro-to-claude",
+          "type": "docs"
+        },
+        {
+          "title": "OpenAI API Reference",
+          "url": "https://platform.openai.com/docs/api-reference",
+          "type": "reference"
+        },
+        {
+          "title": "Vercel AI SDK",
+          "url": "https://sdk.vercel.ai/docs",
+          "type": "docs"
+        }
+      ]
     },
     {
       "id": "lesson-react-flow",
@@ -1265,7 +1350,24 @@
         "react-flow"
       ],
       "content": "React Flow renders interactive node-based graphs using React components. You define nodes (with positions, types, and data) and edges (connections between nodes), and React Flow handles rendering, zoom, pan, and selection. Custom node types let you render any React content inside a node. In ThinkDiff, reasoning traces become tree graphs where each node represents a reasoning phase (hypothesis, analysis, conclusion) and edges show logical flow. Learn to define custom node types, compute tree layouts, style edges with gradients, and handle user interactions like click-to-expand.",
-      "estimatedMinutes": 60
+      "estimatedMinutes": 60,
+      "resources": [
+        {
+          "title": "React Flow Docs",
+          "url": "https://reactflow.dev/learn",
+          "type": "docs"
+        },
+        {
+          "title": "React Flow Examples",
+          "url": "https://reactflow.dev/examples",
+          "type": "tutorial"
+        },
+        {
+          "title": "D3.js Concepts",
+          "url": "https://d3js.org/what-is-d3",
+          "type": "reference"
+        }
+      ]
     },
     {
       "id": "lesson-animation",
@@ -1279,7 +1381,24 @@
         "oklch-colors"
       ],
       "content": "Framer Motion makes React animations declarative: replace div with motion.div and add initial, animate, and transition props. Spring physics create natural-feeling motion, and AnimatePresence handles exit animations when components unmount. Combined with glassmorphism styling (backdrop-blur + transparent backgrounds) and oklch colors, animations bring the UI to life. In ThinkDiff, panels slide in with spring transitions, metric counters animate from zero, and phase highlights pulse during the reasoning replay feature.",
-      "estimatedMinutes": 45
+      "estimatedMinutes": 45,
+      "resources": [
+        {
+          "title": "Framer Motion Docs",
+          "url": "https://www.framer.com/motion/",
+          "type": "docs"
+        },
+        {
+          "title": "Framer Motion: Animation",
+          "url": "https://www.framer.com/motion/animation/",
+          "type": "tutorial"
+        },
+        {
+          "title": "MDN: CSS Transitions",
+          "url": "https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_transitions/Using_CSS_transitions",
+          "type": "reference"
+        }
+      ]
     },
     {
       "id": "lesson-full-stack",
@@ -1294,7 +1413,24 @@
         "parallel-execution"
       ],
       "content": "Bringing it all together: a full-stack AI application that spans from API integration to data processing to interactive visualization. ThinkDiff's architecture follows a clear data flow: user enters a prompt, the API layer calls multiple LLMs in parallel, the parser transforms raw traces into structured phases, the alignment algorithm matches phases across models, and the visualization layer renders everything as interactive trees and comparison views. Learn how to design data pipelines that transform unstructured AI output into structured, visualizable data, and how to architect a React application that keeps complex state manageable.",
-      "estimatedMinutes": 75
+      "estimatedMinutes": 75,
+      "resources": [
+        {
+          "title": "Next.js: Getting Started",
+          "url": "https://nextjs.org/docs/getting-started",
+          "type": "docs"
+        },
+        {
+          "title": "Vercel Deployment Docs",
+          "url": "https://vercel.com/docs/deployments/overview",
+          "type": "docs"
+        },
+        {
+          "title": "Full Stack Open",
+          "url": "https://fullstackopen.com/en/",
+          "type": "tutorial"
+        }
+      ]
     }
   ]
 }

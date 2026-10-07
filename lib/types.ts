@@ -118,6 +118,12 @@ export interface Decision {
   category: TechCategory;
 }
 
+export interface LessonResource {
+  title: string;
+  url: string;
+  type: "docs" | "tutorial" | "video" | "article" | "reference";
+}
+
 export interface Lesson {
   id: string;
   order: number;
@@ -126,6 +132,7 @@ export interface Lesson {
   concepts: string[];
   content: string;
   estimatedMinutes: number;
+  resources: LessonResource[];
 }
 
 // View state

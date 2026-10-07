@@ -197,7 +197,14 @@ Analyze this codebase and return a JSON object with EXACTLY this structure (no m
       "difficulty": "<beginner|intermediate|advanced>",
       "concepts": ["<concept-ids covered>"],
       "content": "<markdown content: explain the concept, show code examples from this repo, explain how it's used here>",
-      "estimatedMinutes": <number>
+      "estimatedMinutes": <number>,
+      "resources": [
+        {
+          "title": "<resource title>",
+          "url": "<direct URL to official docs, MDN, tutorial, or video>",
+          "type": "<docs|tutorial|video|article|reference>"
+        }
+      ]
     }
   ]
 }
@@ -216,7 +223,7 @@ Analyze this codebase and return a JSON object with EXACTLY this structure (no m
 
 6. **Decisions**: Identify 4-8 key architectural/technology decisions and explain the tradeoffs.
 
-7. **Learning Path**: Create 5-10 lessons that would teach someone this codebase from scratch, ordered from basic to advanced. Include real code snippets from the repo in the content field (as markdown code blocks).
+7. **Learning Path**: Create 5-10 lessons that would teach someone this codebase from scratch, ordered from basic to advanced. Include real code snippets from the repo in the content field (as markdown code blocks). For each lesson, provide 2-4 high-quality learning resources — official documentation, MDN references, well-known tutorials, or YouTube videos. Use real, well-known URLs (e.g., react.dev, developer.mozilla.org, nextjs.org/docs). Prefer official docs over blog posts.
 
 Return ONLY the JSON object. No markdown fences, no explanation text.`;
 }
