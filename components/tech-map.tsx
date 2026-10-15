@@ -93,7 +93,9 @@ function CenterNode(_props: NodeProps) {
 
 /* ─── Tech node (custom) ─── */
 function TechNode({ data }: NodeProps) {
-  const [expanded, setExpanded] = useState(false);
+  // Expansion lives in TechMap so the open card can be raised above its neighbors
+  const expanded = Boolean(data.expanded);
+  const onToggle = data.onToggle as () => void;
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
   const tc = themeColors(isDark);
@@ -129,7 +131,7 @@ function TechNode({ data }: NodeProps) {
           minWidth: 160,
           maxWidth: 260,
         }}
-        onClick={() => setExpanded((v) => !v)}
+        onClick={onToggle}
       >
         {/* Header */}
         <div className="flex items-center gap-2 mb-1.5">
@@ -345,10 +347,30 @@ export function TechMap() {
   const isDark = resolvedTheme === "dark";
   const tc = themeColors(isDark);
 
-  const { nodes, edges } = useMemo(
+  const { nodes: layoutNodes, edges } = useMemo(
     () => buildLayout(technologies, tc),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [technologies, isDark]
+  );
+
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const nodes = useMemo(
+    () =>
+      layoutNodes.map((node) =>
+        node.type === "tech"
+          ? {
+              ...node,
+              zIndex: node.id === expandedId ? 1000 : 0,
+              data: {
+                ...node.data,
+                expanded: node.id === expandedId,
+                onToggle: () =>
+                  setExpandedId((id) => (id === node.id ? null : node.id)),
+              },
+            }
+          : node
+      ),
+    [layoutNodes, expandedId]
   );
 
   const onInit = useCallback((instance: { fitView: () => void }) => {
