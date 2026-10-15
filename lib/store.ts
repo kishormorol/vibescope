@@ -12,6 +12,7 @@ interface VibescopeState {
   isAnalyzing: boolean;
   analyzeProgress: number;
   analyzeStatus: string;
+  analyzeError: string | null;
 
   // UI
   activeTab: AnalysisTab;
@@ -33,15 +34,17 @@ interface VibescopeState {
   reset: () => void;
   loadCachedRepos: () => Promise<void>;
   loadFromCache: (repoUrl: string) => Promise<boolean>;
+  runAnalysis: () => Promise<void>;
 }
 
-export const useStore = create<VibescopeState>((set) => ({
+export const useStore = create<VibescopeState>((set, get) => ({
   repoUrl: "",
   apiKey: "",
   analysis: null,
   isAnalyzing: false,
   analyzeProgress: 0,
   analyzeStatus: "",
+  analyzeError: null,
   activeTab: "pipeline",
   selectedFile: null,
   selectedConcept: null,
@@ -67,6 +70,7 @@ export const useStore = create<VibescopeState>((set) => ({
       isAnalyzing: false,
       analyzeProgress: 0,
       analyzeStatus: "",
+      analyzeError: null,
       activeTab: "pipeline",
       selectedFile: null,
       selectedConcept: null,
@@ -88,5 +92,71 @@ export const useStore = create<VibescopeState>((set) => ({
       return true;
     }
     return false;
+  },
+  runAnalysis: async () => {
+    const { repoUrl, apiKey } = get();
+    set({
+      analysis: null,
+      isAnalyzing: true,
+      analyzeProgress: 0,
+      analyzeStatus: "Starting analysis...",
+      analyzeError: null,
+      activeTab: "pipeline",
+      selectedFile: null,
+      selectedConcept: null,
+    });
+
+    const fail = (message: string) =>
+      set({ isAnalyzing: false, analyzeProgress: 0, analyzeError: message });
+
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ repoUrl, apiKey }),
+      });
+
+      if (!res.ok || !res.body) {
+        const body = await res.json().catch(() => null);
+        return fail(body?.error || `Request failed (${res.status})`);
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        const events = buffer.split("\n\n");
+        buffer = events.pop() ?? "";
+
+        for (const event of events) {
+          if (!event.startsWith("data: ")) continue;
+          const data = JSON.parse(event.slice(6)) as {
+            progress: number;
+            status: string;
+            result?: CodebaseAnalysis;
+            error?: string;
+          };
+          if (data.error) return fail(data.error);
+          if (data.result) {
+            get().setAnalysis(data.result, repoUrl);
+            get().loadCachedRepos();
+            return;
+          }
+          set({ analyzeProgress: data.progress, analyzeStatus: data.status });
+        }
+      }
+
+      fail("The connection closed before the analysis finished. Please try again.");
+    } catch (e) {
+      fail(e instanceof Error ? e.message : "Network error. Please try again.");
+    } finally {
+      // Don't keep the key around longer than needed
+      set({ apiKey: "" });
+    }
   },
 }));

@@ -50,7 +50,7 @@ function TypingSubtitle() {
 }
 
 export default function HomePage() {
-  const { repoUrl, setRepoUrl, setApiKey, setAnalysis, cachedRepos, loadCachedRepos, loadFromCache } = useStore();
+  const { repoUrl, setRepoUrl, setApiKey, runAnalysis, cachedRepos, loadCachedRepos, loadFromCache } = useStore();
   const router = useRouter();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
@@ -68,8 +68,10 @@ export default function HomePage() {
   };
 
   const handleStartAnalysis = () => {
-    setApiKey(tempApiKey);
+    setApiKey(tempApiKey.trim());
+    setTempApiKey("");
     setShowApiKeyModal(false);
+    runAnalysis();
     router.push("/analyze");
   };
 
@@ -148,6 +150,9 @@ export default function HomePage() {
             <Input
               value={repoUrl}
               onChange={(e) => setRepoUrl(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleAnalyze();
+              }}
               placeholder="github.com/user/repo"
               className="h-14 pl-5 pr-5 rounded-xl glass border-[oklch(0.25_0.03_260_/_50%)] text-base font-mono focus:glow-primary transition-all"
             />
@@ -268,8 +273,17 @@ export default function HomePage() {
           </DialogHeader>
           <div className="space-y-4 py-2">
             <p className="text-sm text-muted-foreground">
-              VibeScope uses Claude to analyze your codebase. Your key is never
-              stored on any server.
+              VibeScope uses Claude to analyze your codebase. Your key is sent
+              only to run this analysis and is never stored. Get one at{" "}
+              <a
+                href="https://console.anthropic.com/settings/keys"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-foreground"
+              >
+                console.anthropic.com
+              </a>
+              .
             </p>
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">API Key</Label>
@@ -277,6 +291,9 @@ export default function HomePage() {
                 type="password"
                 value={tempApiKey}
                 onChange={(e) => setTempApiKey(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && tempApiKey.trim()) handleStartAnalysis();
+                }}
                 placeholder="sk-ant-..."
                 className="h-10 rounded-lg font-mono text-xs glass"
               />

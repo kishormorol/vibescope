@@ -9,6 +9,12 @@ import { callClaude } from "@/lib/llm/client";
 import { buildAnalysisPrompt } from "@/lib/llm/prompts";
 import type { CodebaseAnalysis } from "@/lib/types";
 
+// Generating a full analysis takes a few minutes
+export const maxDuration = 300;
+
+// Rough size of a complete analysis, used only to animate progress while Claude writes
+const EXPECTED_RESPONSE_CHARS = 70_000;
+
 interface AnalyzeRequest {
   repoUrl: string;
   apiKey: string;
@@ -102,7 +108,17 @@ export async function POST(request: Request) {
           status: "Sending to Claude for deep analysis...",
         });
 
-        const response = await callClaude(prompt, apiKey);
+        let lastSent = 0;
+        const response = await callClaude(prompt, apiKey, (chars) => {
+          const now = Date.now();
+          if (now - lastSent < 1500) return;
+          lastSent = now;
+          const fraction = Math.min(chars / EXPECTED_RESPONSE_CHARS, 1);
+          send({
+            progress: Math.round(65 + fraction * 20),
+            status: `Claude is writing the analysis (${Math.round(chars / 1000)}K characters)...`,
+          });
+        });
 
         send({ progress: 85, status: "Parsing analysis results..." });
 
@@ -113,19 +129,15 @@ export async function POST(request: Request) {
           // Try to extract JSON from the response (in case Claude wrapped it)
           let jsonStr = response.trim();
 
-          // Remove markdown code fences if present
-          if (jsonStr.startsWith("```json")) {
-            jsonStr = jsonStr.slice(7);
-          } else if (jsonStr.startsWith("```")) {
-            jsonStr = jsonStr.slice(3);
+          // Strip markdown fences or surrounding prose by taking the outermost object
+          const start = jsonStr.indexOf("{");
+          const end = jsonStr.lastIndexOf("}");
+          if (start !== -1 && end > start) {
+            jsonStr = jsonStr.slice(start, end + 1);
           }
-          if (jsonStr.endsWith("```")) {
-            jsonStr = jsonStr.slice(0, -3);
-          }
-          jsonStr = jsonStr.trim();
 
           analysis = JSON.parse(jsonStr);
-        } catch (parseError) {
+        } catch {
           send({
             progress: 0,
             status: "Error",

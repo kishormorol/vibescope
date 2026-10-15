@@ -54,11 +54,21 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### Analyze Your Own Codebase
 
 1. Enter a **public GitHub repo URL** (e.g., `https://github.com/user/repo`)
-2. Click the **key icon** to enter your Anthropic API key (uses Claude for analysis)
-3. Click **Analyze** — progress streams in real-time via SSE
-4. Explore all 6 views of your codebase
+2. Click **Analyze** and enter your [Anthropic API key](https://console.anthropic.com/settings/keys) (uses Claude for analysis)
+3. Progress streams in real-time via SSE — a full analysis usually takes 1–4 minutes
+4. Explore all 6 views of your codebase. Results are cached in your browser for 7 days.
 
-> Your API key is stored only in your browser's memory and never sent to our servers. Analysis calls go directly from your browser to the Anthropic API.
+> Your API key is held in browser memory and passed through the VibeScope server only to make the Claude request for your analysis. It is never stored or logged.
+
+### Self-Hosting
+
+Deploy to Vercel (or any Node host) with no required configuration. Optionally set:
+
+| Variable | Purpose |
+|---|---|
+| `GITHUB_TOKEN` | A GitHub token (no scopes needed) to raise the GitHub API limit from 60 to 5,000 requests/hour. Recommended for public deployments — without it, all visitors share the 60/hour limit. |
+
+Analyses can take a few minutes, so the API route sets `maxDuration = 300`.
 
 ---
 

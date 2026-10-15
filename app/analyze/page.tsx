@@ -23,8 +23,14 @@ const VIEW_MAP: Record<AnalysisTab, React.ComponentType> = {
 };
 
 export default function AnalyzePage() {
-  const { analysis, isAnalyzing, analyzeProgress, analyzeStatus, activeTab } =
-    useStore();
+  const {
+    analysis,
+    isAnalyzing,
+    analyzeProgress,
+    analyzeStatus,
+    analyzeError,
+    activeTab,
+  } = useStore();
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
 
@@ -35,9 +41,18 @@ export default function AnalyzePage() {
           <div className="w-16 h-16 rounded-2xl glass flex items-center justify-center text-3xl text-muted-foreground/30 mx-auto">
             ⊘
           </div>
-          <p className="text-muted-foreground text-sm">
-            No analysis loaded. Go back and analyze a repo or try the demo.
-          </p>
+          {analyzeError ? (
+            <div className="space-y-1 max-w-md">
+              <p className="text-foreground text-sm font-semibold">
+                Analysis failed
+              </p>
+              <p className="text-muted-foreground text-sm">{analyzeError}</p>
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-sm">
+              No analysis loaded. Go back and analyze a repo or try the demo.
+            </p>
+          )}
           <Link
             href="/"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs glass hover:glow-primary transition-all text-muted-foreground hover:text-foreground"
@@ -93,6 +108,9 @@ export default function AnalyzePage() {
             </div>
             <p className="text-[10px] font-mono text-muted-foreground/40">
               {analyzeProgress}%
+            </p>
+            <p className="text-xs text-muted-foreground/40 max-w-xs mx-auto pt-2">
+              Large repos can take a few minutes. Keep this tab open.
             </p>
           </div>
         </motion.div>

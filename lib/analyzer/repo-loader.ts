@@ -114,6 +114,17 @@ const PRIORITY_ROOT_FILES = new Set([
 const MAX_FILES = 50;
 const MAX_FILE_SIZE = 100_000; // 100KB per file
 
+// Optional server-side token raises GitHub's limit from 60 to 5,000 requests/hour
+function githubHeaders(): HeadersInit {
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github.v3+json",
+  };
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
+  return headers;
+}
+
 /**
  * Parse owner and repo from a GitHub URL.
  * Supports: github.com/owner/repo, https://github.com/owner/repo, etc.
@@ -177,7 +188,7 @@ function priorityScore(path: string): number {
 }
 
 /**
- * Load repository contents from GitHub API (unauthenticated).
+ * Load repository contents from GitHub API (authenticated if GITHUB_TOKEN is set).
  * Returns up to ~50 most important files with their content.
  */
 export async function loadRepo(repoUrl: string): Promise<RepoFile[]> {
@@ -186,9 +197,7 @@ export async function loadRepo(repoUrl: string): Promise<RepoFile[]> {
   // Get the default branch
   const repoRes = await fetch(
     `https://api.github.com/repos/${owner}/${repo}`,
-    {
-      headers: { Accept: "application/vnd.github.v3+json" },
-    }
+    { headers: githubHeaders() }
   );
 
   if (!repoRes.ok) {
@@ -211,9 +220,7 @@ export async function loadRepo(repoUrl: string): Promise<RepoFile[]> {
   // Get full file tree
   const treeRes = await fetch(
     `https://api.github.com/repos/${owner}/${repo}/git/trees/${defaultBranch}?recursive=1`,
-    {
-      headers: { Accept: "application/vnd.github.v3+json" },
-    }
+    { headers: githubHeaders() }
   );
 
   if (!treeRes.ok) {
