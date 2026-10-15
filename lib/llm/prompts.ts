@@ -20,7 +20,10 @@ export function buildAnalysisPrompt(
 
   // Build dependency list
   const depList = deps.dependencies
-    .map((d) => `  ${d.name}@${d.version} [${d.category}]${d.isDev ? " (dev)" : ""}`)
+    .map(
+      (d) =>
+        `  ${d.name}${d.version ? `@${d.version}` : ""} [${d.ecosystem}, ${d.category}]${d.isDev ? " (dev)" : ""}`
+    )
     .join("\n");
 
   // Build language stats
@@ -32,6 +35,17 @@ export function buildAnalysisPrompt(
   const keyFilePatterns = [
     "package.json",
     "tsconfig.json",
+    "pyproject.toml",
+    "requirements.txt",
+    "Pipfile",
+    "setup.py",
+    "manage.py",
+    "main.py",
+    "app.py",
+    /settings\.py$/,
+    /models\.py$/,
+    /urls\.py$/,
+    /views\.py$/,
     /config/,
     /layout\./,
     /page\./,
@@ -148,7 +162,7 @@ Analyze this codebase and return a JSON object with EXACTLY this structure (no m
       "officialUrl": "<official website>",
       "docsUrl": "<documentation URL>",
       "version": "<version if known>",
-      "packageName": "<exact package name from package.json, or omit if not a dependency>"
+      "packageName": "<exact package name as listed under Dependencies above (npm or PyPI), or omit if not a dependency>"
     }
   ],
   "pipeline": [

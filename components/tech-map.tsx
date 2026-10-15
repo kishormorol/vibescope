@@ -204,11 +204,14 @@ function TechNode({ data }: NodeProps) {
               </div>
 
               {/* Links: docs plus real npm / source pages when it's a dependency */}
-              {(tech.docsUrl || tech.npmUrl || tech.repoUrl) && (
+              {(tech.docsUrl || tech.packageUrl || tech.repoUrl) && (
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {[
                     { label: "Docs", url: tech.docsUrl },
-                    { label: "npm", url: tech.npmUrl },
+                    {
+                      label: tech.registry === "pypi" ? "PyPI" : "npm",
+                      url: tech.packageUrl,
+                    },
                     { label: "Source", url: tech.repoUrl },
                   ]
                     .filter((l) => l.url)

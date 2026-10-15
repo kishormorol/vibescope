@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════
 
 import { loadRepo } from "@/lib/analyzer/repo-loader";
-import { parseDependencies } from "@/lib/analyzer/dependency-parser";
+import { parseProjectDependencies } from "@/lib/analyzer/dependency-parser";
 import { scanFiles } from "@/lib/analyzer/file-scanner";
 import { callClaude } from "@/lib/llm/client";
 import { buildAnalysisPrompt } from "@/lib/llm/prompts";
@@ -83,12 +83,9 @@ export async function POST(request: Request) {
         });
 
         // Step 2: Parse dependencies
-        const packageJsonFile = files.find((f) => f.path === "package.json");
-        const deps = packageJsonFile
-          ? parseDependencies(packageJsonFile.content)
-          : { dependencies: [] };
+        const deps = parseProjectDependencies(files);
 
-        // Look up real package docs on npm while Claude works
+        // Look up real package docs on npm / PyPI while Claude works
         const packagesPromise = fetchPackageInfo(deps.dependencies);
 
         send({

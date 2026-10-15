@@ -594,7 +594,8 @@
       "docsUrl": "https://nextjs.org/docs",
       "version": "16.3.8",
       "packageName": "next",
-      "npmUrl": "https://www.npmjs.com/package/next",
+      "registry": "npm",
+      "packageUrl": "https://www.npmjs.com/package/next",
       "repoUrl": "https://github.com/vercel/next.js"
     },
     {
@@ -607,7 +608,8 @@
       "docsUrl": "https://react.dev/learn",
       "version": "19.2.8",
       "packageName": "react",
-      "npmUrl": "https://www.npmjs.com/package/react",
+      "registry": "npm",
+      "packageUrl": "https://www.npmjs.com/package/react",
       "repoUrl": "https://github.com/react/react"
     },
     {
@@ -620,7 +622,8 @@
       "docsUrl": "https://www.typescriptlang.org/docs",
       "packageName": "typescript",
       "version": "5",
-      "npmUrl": "https://www.npmjs.com/package/typescript",
+      "registry": "npm",
+      "packageUrl": "https://www.npmjs.com/package/typescript",
       "repoUrl": "https://github.com/microsoft/TypeScript"
     },
     {
@@ -633,7 +636,8 @@
       "docsUrl": "https://reactflow.dev/learn",
       "packageName": "@xyflow/react",
       "version": "12.12.0",
-      "npmUrl": "https://www.npmjs.com/package/@xyflow/react",
+      "registry": "npm",
+      "packageUrl": "https://www.npmjs.com/package/@xyflow/react",
       "repoUrl": "https://github.com/xyflow/xyflow"
     },
     {
@@ -646,7 +650,8 @@
       "docsUrl": "https://zustand.docs.pmnd.rs",
       "packageName": "zustand",
       "version": "5.0.15",
-      "npmUrl": "https://www.npmjs.com/package/zustand",
+      "registry": "npm",
+      "packageUrl": "https://www.npmjs.com/package/zustand",
       "repoUrl": "https://github.com/pmndrs/zustand"
     },
     {
@@ -659,7 +664,8 @@
       "docsUrl": "https://motion.dev/docs/react-quick-start",
       "packageName": "framer-motion",
       "version": "14.0.0",
-      "npmUrl": "https://www.npmjs.com/package/framer-motion",
+      "registry": "npm",
+      "packageUrl": "https://www.npmjs.com/package/framer-motion",
       "repoUrl": "https://github.com/motiondivision/motion"
     },
     {
@@ -672,7 +678,8 @@
       "docsUrl": "https://ui.shadcn.com/docs",
       "packageName": "shadcn",
       "version": "4.21.2",
-      "npmUrl": "https://www.npmjs.com/package/shadcn",
+      "registry": "npm",
+      "packageUrl": "https://www.npmjs.com/package/shadcn",
       "repoUrl": "https://github.com/shadcn-ui/ui"
     },
     {
@@ -685,7 +692,8 @@
       "docsUrl": "https://tailwindcss.com/docs",
       "version": "4",
       "packageName": "tailwindcss",
-      "npmUrl": "https://www.npmjs.com/package/tailwindcss",
+      "registry": "npm",
+      "packageUrl": "https://www.npmjs.com/package/tailwindcss",
       "repoUrl": "https://github.com/tailwindlabs/tailwindcss"
     },
     {
@@ -698,7 +706,8 @@
       "docsUrl": "https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking",
       "packageName": "@anthropic-ai/sdk",
       "version": "0.131.0",
-      "npmUrl": "https://www.npmjs.com/package/@anthropic-ai/sdk",
+      "registry": "npm",
+      "packageUrl": "https://www.npmjs.com/package/@anthropic-ai/sdk",
       "repoUrl": "https://github.com/anthropics/anthropic-sdk-typescript"
     },
     {
@@ -711,7 +720,8 @@
       "docsUrl": "https://platform.openai.com/docs/api-reference",
       "packageName": "openai",
       "version": "7.28.0",
-      "npmUrl": "https://www.npmjs.com/package/openai",
+      "registry": "npm",
+      "packageUrl": "https://www.npmjs.com/package/openai",
       "repoUrl": "https://github.com/openai/openai-node"
     },
     {

@@ -2,6 +2,8 @@
 // REPO LOADER — Fetch repo contents from GitHub API
 // ═══════════════════════════════════════════════
 
+import { isDependencyManifest } from "./dependency-parser";
+
 export interface RepoFile {
   path: string;
   content: string;
@@ -51,6 +53,16 @@ const SKIP_EXTENSIONS = new Set([
   ".dylib",
   ".wasm",
   ".map",
+  ".pyc",
+  ".pyo",
+  ".whl",
+  ".pkl",
+  ".pt",
+  ".onnx",
+  ".h5",
+  ".parquet",
+  ".sqlite",
+  ".db",
 ]);
 
 // Directories to skip entirely
@@ -63,6 +75,13 @@ const SKIP_DIRS = [
   ".turbo",
   ".vercel",
   "__pycache__",
+  ".venv",
+  "venv",
+  ".tox",
+  ".mypy_cache",
+  ".pytest_cache",
+  ".ruff_cache",
+  "site-packages",
   ".cache",
   "coverage",
   ".husky",
@@ -78,6 +97,9 @@ const SKIP_FILES = new Set([
   "Gemfile.lock",
   "Cargo.lock",
   "poetry.lock",
+  "uv.lock",
+  "Pipfile.lock",
+  "pdm.lock",
 ]);
 
 // Priority directories (files here are fetched first)
@@ -109,6 +131,16 @@ const PRIORITY_ROOT_FILES = new Set([
   ".env.example",
   "docker-compose.yml",
   "Dockerfile",
+  // Python
+  "pyproject.toml",
+  "requirements.txt",
+  "requirements-dev.txt",
+  "Pipfile",
+  "setup.py",
+  "setup.cfg",
+  "manage.py",
+  "main.py",
+  "app.py",
 ]);
 
 const MAX_FILES = 50;
@@ -175,8 +207,9 @@ function shouldSkipPath(path: string): boolean {
 }
 
 function priorityScore(path: string): number {
-  // Root config files get highest priority
+  // Root config files and dependency manifests get highest priority
   if (!path.includes("/") && PRIORITY_ROOT_FILES.has(path)) return 100;
+  if (isDependencyManifest(path)) return 100;
 
   // Priority directories
   for (let i = 0; i < PRIORITY_DIRS.length; i++) {

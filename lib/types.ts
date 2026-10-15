@@ -79,9 +79,10 @@ export interface Technology {
   docsUrl: string;
   version?: string;
   icon?: string;
-  // Filled from the npm registry when the technology is a dependency
+  // Filled from the package registry when the technology is a dependency
   packageName?: string;
-  npmUrl?: string;
+  registry?: "npm" | "pypi";
+  packageUrl?: string; // npmjs.com / pypi.org page
   repoUrl?: string;
 }
 

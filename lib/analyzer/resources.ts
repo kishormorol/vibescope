@@ -4,14 +4,20 @@
 // ═══════════════════════════════════════════════
 
 import type { CodebaseAnalysis, LessonResource } from "@/lib/types";
-import type { ParsedDependency } from "./dependency-parser";
+import {
+  normalizePythonName,
+  type Ecosystem,
+  type ParsedDependency,
+} from "./dependency-parser";
 
 export interface PackageInfo {
   name: string;
-  version: string; // version range declared in package.json
+  version: string; // version declared in the project's manifest
+  registry: Ecosystem;
   homepage?: string;
+  docsUrl?: string;
   repoUrl?: string;
-  npmUrl: string;
+  packageUrl: string; // npmjs.com / pypi.org page
 }
 
 const MAX_PACKAGES = 60;
@@ -42,56 +48,106 @@ function normalizeRepoUrl(repository: unknown): string | undefined {
   return url.startsWith("http") ? url : undefined;
 }
 
-async function fetchOnePackage(
+const CODE_HOST = /^https?:\/\/(www\.)?(github|gitlab|bitbucket)\.(com|org)\//;
+const REGISTRY_HOST = /^https?:\/\/(www\.)?(pypi\.org|npmjs\.com|npmjs\.org)\//;
+
+// Many packages set their homepage to the repo ("<repo>#readme") or their registry
+// page; those are already covered by repoUrl / packageUrl, so only treat it as a
+// homepage when it's a real project site
+function siteUrl(url: unknown): string | undefined {
+  return typeof url === "string" &&
+    url.startsWith("http") &&
+    !CODE_HOST.test(url) &&
+    !REGISTRY_HOST.test(url)
+    ? url
+    : undefined;
+}
+
+async function fetchNpmPackage(
   dep: ParsedDependency
 ): Promise<PackageInfo | null> {
   const encoded = dep.name.replace("/", "%2f");
-  try {
-    const res = await fetch(`https://registry.npmjs.org/${encoded}/latest`, {
-      signal: AbortSignal.timeout(LINK_TIMEOUT_MS),
-    });
-    if (!res.ok) return null;
-    const data = (await res.json()) as {
-      homepage?: string;
-      repository?: unknown;
+  const res = await fetch(`https://registry.npmjs.org/${encoded}/latest`, {
+    signal: AbortSignal.timeout(LINK_TIMEOUT_MS),
+  });
+  if (!res.ok) return null;
+  const data = (await res.json()) as {
+    homepage?: string;
+    repository?: unknown;
+  };
+  return {
+    name: dep.name,
+    version: dep.version,
+    registry: "npm",
+    homepage: siteUrl(data.homepage),
+    repoUrl: normalizeRepoUrl(data.repository),
+    packageUrl: `https://www.npmjs.com/package/${dep.name}`,
+  };
+}
+
+async function fetchPypiPackage(
+  dep: ParsedDependency
+): Promise<PackageInfo | null> {
+  const name = normalizePythonName(dep.name);
+  const res = await fetch(`https://pypi.org/pypi/${name}/json`, {
+    signal: AbortSignal.timeout(LINK_TIMEOUT_MS),
+  });
+  if (!res.ok) return null;
+  const { info } = (await res.json()) as {
+    info: {
+      home_page?: string | null;
+      project_urls?: Record<string, string> | null;
     };
-    const repoUrl = normalizeRepoUrl(data.repository);
-    // Many packages set homepage to "<repo>#readme"; that's already covered by repoUrl,
-    // so only treat it as a homepage when it's a real project site
-    const homepage =
-      typeof data.homepage === "string" &&
-      data.homepage.startsWith("http") &&
-      !/^https?:\/\/(www\.)?(github|gitlab)\.com\//.test(data.homepage)
-        ? data.homepage
-        : undefined;
-    return {
-      name: dep.name,
-      version: dep.version,
-      homepage,
-      repoUrl,
-      npmUrl: `https://www.npmjs.com/package/${dep.name}`,
-    };
-  } catch {
-    return null;
-  }
+  };
+
+  // project_urls labels are free-form ("Documentation", "Source Code", "Homepage", ...)
+  const urls = Object.entries(info.project_urls ?? {});
+  const find = (pattern: RegExp) =>
+    urls.find(([label]) => pattern.test(label))?.[1];
+  const anyCodeHostUrl = [info.home_page, ...urls.map(([, u]) => u)].find(
+    (u): u is string => typeof u === "string" && CODE_HOST.test(u)
+  );
+
+  return {
+    name: dep.name,
+    version: dep.version,
+    registry: "pypi",
+    homepage: siteUrl(find(/^home\s*page$|^homepage$|^home$|^website$/i) ?? info.home_page),
+    docsUrl: siteUrl(find(/doc/i)),
+    repoUrl:
+      normalizeRepoUrl(find(/^(source|repository|code|source code|github)$/i)) ??
+      normalizeRepoUrl(anyCodeHostUrl?.replace(/(github\.com\/[^/]+\/[^/#?]+).*/, "$1")),
+    packageUrl: `https://pypi.org/project/${name}/`,
+  };
+}
+
+function registryKey(name: string, registry: Ecosystem): string {
+  return registry === "pypi" ? `pypi:${normalizePythonName(name)}` : name;
 }
 
 /**
- * Look up each dependency on the npm registry for its real homepage and repo.
- * Type-only packages are skipped; failures are ignored.
+ * Look up each dependency on its registry (npm or PyPI) for the real homepage,
+ * docs, and source repo. Type-only packages are skipped; failures are ignored.
  */
 export async function fetchPackageInfo(
   deps: ParsedDependency[]
 ): Promise<Map<string, PackageInfo>> {
   const candidates = deps
-    .filter((d) => !d.name.startsWith("@types/"))
+    .filter((d) => !d.name.startsWith("@types/") && !/^types-/i.test(d.name))
     .sort((a, b) => Number(a.isDev) - Number(b.isDev))
     .slice(0, MAX_PACKAGES);
 
-  const results = await Promise.all(candidates.map(fetchOnePackage));
+  const results = await Promise.all(
+    candidates.map((dep) =>
+      (dep.ecosystem === "pypi" ? fetchPypiPackage(dep) : fetchNpmPackage(dep)).catch(
+        () => null
+      )
+    )
+  );
+
   const map = new Map<string, PackageInfo>();
   for (const info of results) {
-    if (info) map.set(info.name, info);
+    if (info) map.set(registryKey(info.name, info.registry), info);
   }
   return map;
 }
@@ -195,7 +251,10 @@ function findPackage(
 ): PackageInfo | undefined {
   for (const key of [tech.packageName, tech.id, tech.name]) {
     if (!key) continue;
-    const info = packages.get(key) ?? packages.get(key.toLowerCase());
+    const info =
+      packages.get(key) ??
+      packages.get(key.toLowerCase()) ??
+      packages.get(registryKey(key, "pypi"));
     if (info) return info;
   }
   return undefined;
@@ -221,20 +280,23 @@ export async function enrichAnalysis(
   const files = analysis.files ?? [];
 
   // 1. Attach real package data to technologies
+  const registryDocs = new Map<string, string>(); // tech id → docs URL from the registry
   for (const tech of technologies) {
     const pkg = findPackage(tech, packages);
     if (!pkg) continue;
     tech.packageName = pkg.name;
-    tech.version = pkg.version;
-    tech.npmUrl = pkg.npmUrl;
+    if (pkg.version) tech.version = pkg.version;
+    tech.registry = pkg.registry;
+    tech.packageUrl = pkg.packageUrl;
     if (pkg.repoUrl) tech.repoUrl = pkg.repoUrl;
     if (pkg.homepage && !sameUrl(pkg.homepage, tech.officialUrl ?? "")) {
       tech.officialUrl = pkg.homepage;
     }
+    if (pkg.docsUrl) registryDocs.set(tech.id, pkg.docsUrl);
   }
 
   // 2. Check every model-written link in one pass
-  const urls: string[] = [];
+  const urls: string[] = [...registryDocs.values()];
   for (const t of technologies) urls.push(t.docsUrl, t.officialUrl);
   for (const c of concepts) urls.push(c.docUrl);
   for (const l of lessons) for (const r of l.resources ?? []) urls.push(r.url);
@@ -245,7 +307,12 @@ export async function enrichAnalysis(
 
   // 3. Repair or drop broken links
   for (const tech of technologies) {
-    const fallback = [tech.officialUrl, tech.repoUrl, tech.npmUrl].find(ok);
+    const fallback = [
+      registryDocs.get(tech.id),
+      tech.officialUrl,
+      tech.repoUrl,
+      tech.packageUrl,
+    ].find(ok);
     if (!ok(tech.docsUrl)) tech.docsUrl = fallback ?? "";
     if (!ok(tech.officialUrl)) tech.officialUrl = fallback ?? "";
   }

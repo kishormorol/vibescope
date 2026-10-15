@@ -53,7 +53,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Analyze Your Own Codebase
 
-1. Enter a **public GitHub repo URL** (e.g., `https://github.com/user/repo`)
+1. Enter a **public GitHub repo URL** (e.g., `https://github.com/user/repo`). JavaScript/TypeScript and Python projects get the richest results: dependencies are read from `package.json`, `pyproject.toml` (PEP 621, Poetry, uv), `requirements*.txt`, and `Pipfile`, then linked to their real npm/PyPI docs and source.
 2. Click **Analyze** and enter your [Anthropic API key](https://console.anthropic.com/settings/keys) (uses Claude for analysis)
 3. Progress streams in real-time via SSE — a full analysis usually takes 1–4 minutes
 4. Explore all 6 views of your codebase. Results are cached in your browser for 7 days.
