@@ -403,8 +403,7 @@
           "startLine": 1,
           "endLine": 30,
           "conceptId": "zustand-store",
-          "explanation": "Zustand creates a store with create() that returns a hook. Unlike Redux, there's no boilerplate: no action types, reducers, or dispatch. State updates are simple function calls that produce the next state.",
-          "docUrl": "https://zustand.docs.pmnd.rs/getting-started/introduction"
+          "explanation": "Zustand creates a store with create() that returns a hook. Unlike Redux, there's no boilerplate: no action types, reducers, or dispatch. State updates are simple function calls that produce the next state."
         },
         {
           "startLine": 45,
@@ -593,7 +592,10 @@
       "whyChosen": "Provides both the frontend React framework and backend API routes in one unified project, eliminating the need for a separate server. Server components reduce client-side JavaScript for faster initial load.",
       "officialUrl": "https://nextjs.org",
       "docsUrl": "https://nextjs.org/docs",
-      "version": "16"
+      "version": "16.3.8",
+      "packageName": "next",
+      "npmUrl": "https://www.npmjs.com/package/next",
+      "repoUrl": "https://github.com/vercel/next.js"
     },
     {
       "id": "react",
@@ -603,7 +605,10 @@
       "whyChosen": "Industry-standard component model with the largest ecosystem. React 19's server components enable sending less JavaScript to the browser, important for a visualization-heavy app.",
       "officialUrl": "https://react.dev",
       "docsUrl": "https://react.dev/learn",
-      "version": "19"
+      "version": "19.2.8",
+      "packageName": "react",
+      "npmUrl": "https://www.npmjs.com/package/react",
+      "repoUrl": "https://github.com/react/react"
     },
     {
       "id": "typescript",
@@ -612,7 +617,11 @@
       "description": "Typed superset of JavaScript that compiles to plain JS. Adds static type checking, interfaces, generics, and IDE-powered autocomplete to catch bugs before runtime.",
       "whyChosen": "Essential for a project with complex data structures like reasoning traces and alignment matrices. TypeScript catches type mismatches between the parser, store, and UI layers at compile time.",
       "officialUrl": "https://www.typescriptlang.org",
-      "docsUrl": "https://www.typescriptlang.org/docs"
+      "docsUrl": "https://www.typescriptlang.org/docs",
+      "packageName": "typescript",
+      "version": "5",
+      "npmUrl": "https://www.npmjs.com/package/typescript",
+      "repoUrl": "https://github.com/microsoft/TypeScript"
     },
     {
       "id": "react-flow",
@@ -621,7 +630,11 @@
       "description": "Library for building interactive node-based UIs, diagrams, and graphs in React. Supports custom nodes, edges, layouts, zoom, pan, and minimap out of the box.",
       "whyChosen": "Purpose-built for the tree visualization of reasoning traces. Unlike D3, React Flow uses React components for nodes, making it natural to integrate with the rest of the app. Built-in interactivity (zoom, pan, selection) saves significant development time.",
       "officialUrl": "https://reactflow.dev",
-      "docsUrl": "https://reactflow.dev/learn"
+      "docsUrl": "https://reactflow.dev/learn",
+      "packageName": "@xyflow/react",
+      "version": "12.12.0",
+      "npmUrl": "https://www.npmjs.com/package/@xyflow/react",
+      "repoUrl": "https://github.com/xyflow/xyflow"
     },
     {
       "id": "zustand",
@@ -630,7 +643,11 @@
       "description": "Lightweight state management library for React. Creates stores as hooks with no boilerplate, supporting middleware, selectors, and subscriptions.",
       "whyChosen": "Minimal API surface compared to Redux while providing all needed features: shared state across components, selective re-renders via selectors, and middleware for persistence. The hook-based API feels natural in a React codebase.",
       "officialUrl": "https://zustand.docs.pmnd.rs",
-      "docsUrl": "https://zustand.docs.pmnd.rs/getting-started/introduction"
+      "docsUrl": "https://zustand.docs.pmnd.rs",
+      "packageName": "zustand",
+      "version": "5.0.15",
+      "npmUrl": "https://www.npmjs.com/package/zustand",
+      "repoUrl": "https://github.com/pmndrs/zustand"
     },
     {
       "id": "framer-motion",
@@ -639,7 +656,11 @@
       "description": "Production-ready animation library for React. Provides declarative animations, layout transitions, gesture handling, and spring physics with a simple component API.",
       "whyChosen": "Makes complex animations simple with declarative props (initial, animate, exit). The comparison view needs smooth transitions when switching between traces, and the metrics dashboard benefits from animated number counters.",
       "officialUrl": "https://motion.dev",
-      "docsUrl": "https://motion.dev/docs/react-quick-start"
+      "docsUrl": "https://motion.dev/docs/react-quick-start",
+      "packageName": "framer-motion",
+      "version": "14.0.0",
+      "npmUrl": "https://www.npmjs.com/package/framer-motion",
+      "repoUrl": "https://github.com/motiondivision/motion"
     },
     {
       "id": "shadcn-ui",
@@ -648,7 +669,11 @@
       "description": "Collection of reusable UI components built with Radix UI primitives and styled with Tailwind CSS. Components are copied into your project for full customization rather than installed as a dependency.",
       "whyChosen": "Provides accessible, well-designed base components (buttons, dialogs, tabs) without locking into a component library. Since components live in the project, they can be customized to match the glassmorphism design language.",
       "officialUrl": "https://ui.shadcn.com",
-      "docsUrl": "https://ui.shadcn.com/docs"
+      "docsUrl": "https://ui.shadcn.com/docs",
+      "packageName": "shadcn",
+      "version": "4.21.2",
+      "npmUrl": "https://www.npmjs.com/package/shadcn",
+      "repoUrl": "https://github.com/shadcn-ui/ui"
     },
     {
       "id": "tailwind-css",
@@ -658,7 +683,10 @@
       "whyChosen": "Utility classes enable rapid UI iteration without context-switching to CSS files. Tailwind v4's @theme directive allows defining the oklch color palette and glassmorphism tokens directly in CSS, keeping design decisions centralized.",
       "officialUrl": "https://tailwindcss.com",
       "docsUrl": "https://tailwindcss.com/docs",
-      "version": "4"
+      "version": "4",
+      "packageName": "tailwindcss",
+      "npmUrl": "https://www.npmjs.com/package/tailwindcss",
+      "repoUrl": "https://github.com/tailwindlabs/tailwindcss"
     },
     {
       "id": "anthropic-sdk",
@@ -667,7 +695,11 @@
       "description": "Official TypeScript SDK for the Anthropic API. Provides typed methods for message creation, streaming, and extended thinking with Claude models.",
       "whyChosen": "Required for accessing Claude's extended thinking feature, which exposes the model's reasoning chain. The official SDK provides TypeScript types for all API responses, ensuring type safety when parsing thinking blocks.",
       "officialUrl": "https://docs.anthropic.com",
-      "docsUrl": "https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking"
+      "docsUrl": "https://docs.anthropic.com/en/docs/build-with-claude/extended-thinking",
+      "packageName": "@anthropic-ai/sdk",
+      "version": "0.131.0",
+      "npmUrl": "https://www.npmjs.com/package/@anthropic-ai/sdk",
+      "repoUrl": "https://github.com/anthropics/anthropic-sdk-typescript"
     },
     {
       "id": "openai-sdk",
@@ -676,7 +708,11 @@
       "description": "Official TypeScript SDK for the OpenAI API. Supports chat completions, reasoning models, streaming, and function calling. Also serves as a client for OpenAI-compatible APIs like DeepSeek.",
       "whyChosen": "Needed for OpenAI o3 reasoning model access and also used as the client for DeepSeek R1, which exposes an OpenAI-compatible API. One SDK covers two providers.",
       "officialUrl": "https://platform.openai.com",
-      "docsUrl": "https://platform.openai.com/docs/api-reference"
+      "docsUrl": "https://platform.openai.com/docs/api-reference",
+      "packageName": "openai",
+      "version": "7.28.0",
+      "npmUrl": "https://www.npmjs.com/package/openai",
+      "repoUrl": "https://github.com/openai/openai-node"
     },
     {
       "id": "shiki",
@@ -878,7 +914,7 @@
       "category": "State",
       "difficulty": "intermediate",
       "explanation": "Zustand creates global state stores as React hooks with minimal boilerplate. A store is defined by passing a function that returns the initial state and actions to create(). Components access state by calling the store hook with an optional selector. ThinkDiff's store manages trace data, selected models, and UI state like the active comparison mode.",
-      "docUrl": "https://zustand.docs.pmnd.rs/getting-started/introduction",
+      "docUrl": "",
       "prerequisites": [
         "react-hooks"
       ]

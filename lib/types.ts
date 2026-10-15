@@ -79,6 +79,10 @@ export interface Technology {
   docsUrl: string;
   version?: string;
   icon?: string;
+  // Filled from the npm registry when the technology is a dependency
+  packageName?: string;
+  npmUrl?: string;
+  repoUrl?: string;
 }
 
 export type Difficulty = "beginner" | "intermediate" | "advanced";
@@ -133,6 +137,7 @@ export interface Lesson {
   content: string;
   estimatedMinutes: number;
   resources: LessonResource[];
+  technologies?: string[]; // tech ids this lesson covers
 }
 
 // View state

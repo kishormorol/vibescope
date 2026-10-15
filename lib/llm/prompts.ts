@@ -147,7 +147,8 @@ Analyze this codebase and return a JSON object with EXACTLY this structure (no m
       "whyChosen": "<why this was chosen for this project>",
       "officialUrl": "<official website>",
       "docsUrl": "<documentation URL>",
-      "version": "<version if known>"
+      "version": "<version if known>",
+      "packageName": "<exact package name from package.json, or omit if not a dependency>"
     }
   ],
   "pipeline": [
@@ -196,6 +197,7 @@ Analyze this codebase and return a JSON object with EXACTLY this structure (no m
       "title": "<lesson title>",
       "difficulty": "<beginner|intermediate|advanced>",
       "concepts": ["<concept-ids covered>"],
+      "technologies": ["<tech-ids from the technologies list that this lesson uses>"],
       "content": "<markdown content: explain the concept, show code examples from this repo, explain how it's used here>",
       "estimatedMinutes": <number>,
       "resources": [

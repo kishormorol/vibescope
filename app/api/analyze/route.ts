@@ -7,6 +7,7 @@ import { parseDependencies } from "@/lib/analyzer/dependency-parser";
 import { scanFiles } from "@/lib/analyzer/file-scanner";
 import { callClaude } from "@/lib/llm/client";
 import { buildAnalysisPrompt } from "@/lib/llm/prompts";
+import { enrichAnalysis, fetchPackageInfo } from "@/lib/analyzer/resources";
 import type { CodebaseAnalysis } from "@/lib/types";
 
 // Generating a full analysis takes a few minutes
@@ -87,6 +88,9 @@ export async function POST(request: Request) {
           ? parseDependencies(packageJsonFile.content)
           : { dependencies: [] };
 
+        // Look up real package docs on npm while Claude works
+        const packagesPromise = fetchPackageInfo(deps.dependencies);
+
         send({
           progress: 40,
           status: `Found ${deps.dependencies.length} dependencies. Scanning files...`,
@@ -147,7 +151,11 @@ export async function POST(request: Request) {
           return;
         }
 
-        // Step 6: Done
+        // Step 6: Ground links in real package data and drop dead ones
+        send({ progress: 90, status: "Verifying documentation links..." });
+        await enrichAnalysis(analysis, await packagesPromise);
+
+        // Step 7: Done
         send({
           progress: 100,
           status: "Analysis complete!",

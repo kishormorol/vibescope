@@ -203,27 +203,38 @@ function TechNode({ data }: NodeProps) {
                 </p>
               </div>
 
-              {/* Docs link */}
-              {tech.docsUrl && (
-                <a
-                  href={tech.docsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="inline-block mt-2 text-[11px] font-bold uppercase tracking-wider px-2 py-1 rounded-md transition-colors"
-                  style={{
-                    background: tc.hueBadgeBg(h),
-                    color: tc.accentText(h),
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.target as HTMLElement).style.background = tc.accentBg(h);
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.target as HTMLElement).style.background = tc.hueBadgeBg(h);
-                  }}
-                >
-                  Docs &rarr;
-                </a>
+              {/* Links: docs plus real npm / source pages when it's a dependency */}
+              {(tech.docsUrl || tech.npmUrl || tech.repoUrl) && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {[
+                    { label: "Docs", url: tech.docsUrl },
+                    { label: "npm", url: tech.npmUrl },
+                    { label: "Source", url: tech.repoUrl },
+                  ]
+                    .filter((l) => l.url)
+                    .map((l) => (
+                      <a
+                        key={l.label}
+                        href={l.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-block text-[11px] font-bold uppercase tracking-wider px-2 py-1 rounded-md transition-colors"
+                        style={{
+                          background: tc.hueBadgeBg(h),
+                          color: tc.accentText(h),
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.target as HTMLElement).style.background = tc.accentBg(h);
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.target as HTMLElement).style.background = tc.hueBadgeBg(h);
+                        }}
+                      >
+                        {l.label} &rarr;
+                      </a>
+                    ))}
+                </div>
               )}
             </motion.div>
           )}
