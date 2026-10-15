@@ -16,7 +16,7 @@ VibeScope analyzes a codebase and generates **6 interactive views**:
 Animated flow diagram showing how the project was built stage-by-stage — from setup and data modeling through API design, UI, visualization, and polish.
 
 ### 2. Tech Map
-Radial graph of every technology used, color-coded by category (framework, styling, state management, etc.), with version info, "why it was chosen" explanations, and links to official docs.
+Radial graph of every technology used, color-coded by category (framework, styling, state management, etc.), with "why it was chosen" explanations. Dependencies show the exact version declared in the project and **Docs**, **npm/PyPI**, and **Source** links pulled from the real package registry.
 
 ### 3. File Explorer + Code Anatomy
 File tree sidebar with syntax-highlighted source code (Shiki), inline concept annotations, and difficulty ratings. Click any file to see what it does, what concepts it uses, and how it fits into the architecture.
@@ -28,7 +28,7 @@ Knowledge prerequisite graph showing how concepts relate — Components → Prop
 Architecture decision cards: "Why Zustand over Redux?", "Why Tailwind over CSS Modules?" — each with the chosen option, alternatives considered, and reasoning.
 
 ### 6. Learning Path
-Interactive lesson timeline from beginner to advanced. Track your progress, filter by difficulty, click concept tags to jump to the knowledge graph, and work through the codebase at your own pace.
+Interactive lesson timeline from beginner to advanced. Track your progress, filter by difficulty, click concept tags to jump to the knowledge graph, and work through the codebase at your own pace. Each lesson links to learning resources that are checked before they're shown, plus version-specific docs for the technologies it covers.
 
 ---
 
@@ -53,10 +53,19 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Analyze Your Own Codebase
 
-1. Enter a **public GitHub repo URL** (e.g., `https://github.com/user/repo`). JavaScript/TypeScript and Python projects get the richest results: dependencies are read from `package.json`, `pyproject.toml` (PEP 621, Poetry, uv), `requirements*.txt`, and `Pipfile`, then linked to their real npm/PyPI docs and source.
-2. Click **Analyze** and enter your [Anthropic API key](https://console.anthropic.com/settings/keys) (uses Claude for analysis)
-3. Progress streams in real-time via SSE — a full analysis usually takes 1–4 minutes
+1. Enter a **public GitHub repo URL** (e.g., `https://github.com/user/repo`)
+2. Click **Analyze** and enter your [Anthropic API key](https://console.anthropic.com/settings/keys)
+3. Progress streams in real time — a full analysis usually takes 1–4 minutes
 4. Explore all 6 views of your codebase. Results are cached in your browser for 7 days.
+
+Any language works, but **JavaScript/TypeScript and Python** projects get the richest results — their dependencies are read from the manifest and linked to real package data:
+
+| Ecosystem | Manifests read (repo root or one folder down) |
+|---|---|
+| JavaScript / TypeScript | `package.json` |
+| Python | `pyproject.toml` (PEP 621, Poetry, uv/PDM dependency groups), `requirements*.txt`, `requirements/*.txt`, `Pipfile` |
+
+Analysis uses Claude Opus 5.5 on your key — roughly $0.20–0.50 per repo depending on size. Up to 50 of the most important files are analyzed.
 
 > Your API key is held in browser memory and passed through the VibeScope server only to make the Claude request for your analysis. It is never stored or logged.
 
@@ -82,7 +91,9 @@ Analyses can take a few minutes, so the API route sets `maxDuration = 300`.
 | State | Zustand |
 | Animation | Framer Motion |
 | Code Highlighting | Shiki |
-| LLM | Claude (Anthropic SDK) |
+| LLM | Claude Opus 5.5 via Anthropic SDK (streaming) |
+| Package data | npm registry + PyPI JSON API |
+| Manifest parsing | smol-toml |
 | Caching | IndexedDB (idb-keyval) |
 | Deployment | Vercel |
 
@@ -109,7 +120,11 @@ vibescope/
 │   ├── store.ts               # Zustand state
 │   ├── types.ts               # TypeScript interfaces
 │   ├── cache.ts               # IndexedDB caching
-│   ├── analyzer/              # GitHub loader, parsers
+│   ├── analyzer/
+│   │   ├── repo-loader.ts     # GitHub file loading + prioritization
+│   │   ├── dependency-parser.ts # npm + Python manifest parsing
+│   │   ├── file-scanner.ts    # Language and line stats
+│   │   └── resources.ts       # npm/PyPI lookup + link verification
 │   └── llm/                   # Claude API + prompt templates
 └── public/demo/               # Pre-computed demo data
 ```
@@ -118,17 +133,19 @@ vibescope/
 
 ## How It Works
 
-1. **Repo Loading** — Fetches files from a public GitHub repo via the GitHub API
-2. **Dependency Parsing** — Extracts technologies from `package.json`, `requirements.txt`, etc.
-3. **LLM Analysis** — Sends code to Claude with structured prompts to generate:
+1. **Repo Loading** — Fetches up to 50 of the most important files from a public GitHub repo, prioritizing manifests, configs, and entry points (and skipping lock files, build output, virtualenvs, and binaries)
+2. **Dependency Parsing** — Reads npm and Python manifests and categorizes each dependency
+3. **Registry Lookup** — In parallel with the LLM call, looks up every dependency on npm or PyPI for its real homepage, docs, and source repository
+4. **LLM Analysis** — Streams the code to Claude with a structured prompt to generate:
    - File summaries, difficulty ratings, and concept annotations
    - Technology descriptions and "why chosen" reasoning
    - Pipeline stage breakdown
    - Concept prerequisite graph
    - Architecture decisions with alternatives
    - Ordered learning path with estimated times
-4. **Streaming** — Results stream back via Server-Sent Events so you see progress in real-time
-5. **Caching** — Analysis results are cached in IndexedDB (7-day TTL) so repeat visits are instant
+5. **Link Verification** — Replaces model-guessed versions and doc links with registry data, then checks every remaining link (docs, concept references, code annotations, lesson resources, YouTube videos). Definitely-dead links (404, unknown host, missing video) are repaired with a verified fallback or dropped
+6. **Streaming** — Progress streams back via Server-Sent Events so you see each step in real time
+7. **Caching** — Analysis results are cached in IndexedDB (7-day TTL) so repeat visits are instant
 
 ---
 
@@ -146,7 +163,8 @@ vibescope/
 
 Contributions welcome! Some ideas:
 
-- Support for more languages and ecosystems (Python, Rust, Go)
+- Support for more ecosystems (Rust `Cargo.toml`, Go `go.mod`, Java/Kotlin) — add a parser in `lib/analyzer/dependency-parser.ts` and a registry lookup in `lib/analyzer/resources.ts`
+- Resolve exact versions from lock files
 - Export analysis as shareable JSON or PDF
 - Collaborative annotations
 - Custom themes
